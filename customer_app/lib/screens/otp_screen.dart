@@ -25,78 +25,115 @@ class _OtpScreenState extends State<OtpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Spacer(),
+      body: Stack(
+        children: [
+          // Background Image with Opacity Gradient
+          Positioned.fill(
+            child: ShaderMask(
+              shaderCallback: (rect) {
+                return LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withAlpha(26),
+                    Colors.black.withAlpha(102),
+                    Colors.black.withAlpha(102),
+                    Colors.black.withAlpha(26),
+                  ],
+                  stops: const [0.0, 0.3, 0.7, 1.0],
+                ).createShader(rect);
+              },
+              blendMode: BlendMode.dstIn,
+              child: Image.asset(
+                'assets/images/123456123.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
 
-                        // OTP content
-                        Text(
-                          widget.isForgotPassword ? 'Forgot Password?' : 'Enter OTP',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'We have sent a 4-digit code to your phone number',
-                          style: TextStyle(fontSize: 14, color: AppTheme.textGrey),
-                        ),
-                        const SizedBox(height: 32),
+          // Foreground Content
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Spacer(),
 
-                        // OTP Input Fields
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(4, (index) => _buildOtpBox(index)),
-                        ),
+                          // White card with rounded top corners
+                          Container(
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                            ),
+                            padding: const EdgeInsets.fromLTRB(24, 28, 24, 40),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.isForgotPassword ? 'Forgot Password?' : 'Enter OTP',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'We have sent a 4-digit code to your phone number',
+                                  style: TextStyle(fontSize: 14, color: AppTheme.textGrey),
+                                ),
+                                const SizedBox(height: 32),
 
-                        const SizedBox(height: 24),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(4, (index) => _buildOtpBox(index)),
+                                ),
 
-                        Center(
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              "Didn't receive code? Resend",
-                              style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
+                                const SizedBox(height: 24),
+
+                                Center(
+                                  child: TextButton(
+                                    onPressed: () {},
+                                    child: const Text(
+                                      "Didn't receive code? Resend",
+                                      style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                        (route) => false,
+                                      );
+                                    },
+                                    child: Text(widget.isForgotPassword ? 'Reset & Login' : 'Verify & Continue'),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                                (route) => false,
-                              );
-                            },
-                            child: Text(widget.isForgotPassword ? 'Reset & Login' : 'Verify & Continue'),
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-            );
-          },
-        ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
