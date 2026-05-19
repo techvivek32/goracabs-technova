@@ -93,7 +93,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                       const Text(
                         'Explore new ways to travel with Gora Cabs',
                         style: TextStyle(
-                          fontSize: 18, // Increased from 16 to 18
+                          fontSize: 16, // Increased from 16 to 18
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                           shadows: [

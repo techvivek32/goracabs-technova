@@ -17,6 +17,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _cityController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final _idNumberController = TextEditingController();
 
   bool _agreedToPolicy = false;
 
@@ -140,6 +141,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _cityController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
+    _idNumberController.dispose();
     super.dispose();
   }
 
@@ -265,6 +267,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                 hint: 'Enter your email',
                                 icon: Icons.email_outlined,
                                 keyboardType: TextInputType.emailAddress,
+                              ),
+                              const SizedBox(height: 16),
+
+                              _buildLabel('ID Number'),
+                              _buildField(
+                                controller: _idNumberController,
+                                hint: 'Enter your ID number',
+                                icon: Icons.badge_outlined,
                               ),
                               const SizedBox(height: 16),
 
