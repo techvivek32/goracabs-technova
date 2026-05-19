@@ -16,81 +16,86 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   void dispose() {
-    for (var controller in _otpControllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
+    for (var c in _otpControllers) c.dispose();
+    for (var n in _focusNodes) n.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isForgotPassword ? 'Reset Password' : 'Verify OTP'),
-      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.isForgotPassword ? 'Forgot Password?' : 'Enter OTP',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryBlue,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'We have sent a 4-digit code to your phone number',
-                style: TextStyle(fontSize: 16, color: AppTheme.textGrey),
-              ),
-              const SizedBox(height: 48),
-              
-              // OTP Input Fields
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(4, (index) => _buildOtpBox(index)),
-              ),
-              
-              const SizedBox(height: 32),
-              
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    // Resend OTP logic
-                  },
-                  child: const Text(
-                    "Didn't receive code? Resend",
-                    style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Spacer(),
+
+                        // OTP content
+                        Text(
+                          widget.isForgotPassword ? 'Forgot Password?' : 'Enter OTP',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'We have sent a 4-digit code to your phone number',
+                          style: TextStyle(fontSize: 14, color: AppTheme.textGrey),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // OTP Input Fields
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(4, (index) => _buildOtpBox(index)),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        Center(
+                          child: TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Didn't receive code? Resend",
+                              style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                (route) => false,
+                              );
+                            },
+                            child: Text(widget.isForgotPassword ? 'Reset & Login' : 'Verify & Continue'),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              
-              const Spacer(),
-              
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Verify and navigate to Home
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      (route) => false,
-                    );
-                  },
-                  child: Text(widget.isForgotPassword ? 'Reset & Login' : 'Verify & Continue'),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
