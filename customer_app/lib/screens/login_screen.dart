@@ -1,6 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import '../theme/app_theme.dart';
 import 'signup_screen.dart';
 import 'otp_screen.dart';
@@ -15,78 +16,21 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
 
-  // Indian language welcome words
   static const List<String> _welcomeWords = [
-    'Welcome',       // English (used in India)
-    'स्वागत है',      // Hindi
-    'ਸੁਆਗਤ ਹੈ',      // Punjabi
-    'સ્વાગત છે',      // Gujarati
-    'স্বাগতম',        // Bengali
-    'ಸ್ವಾಗತ',         // Kannada
-    'സ്വാഗതം',        // Malayalam
-    'வரவேற்கிறோம்',   // Tamil
-    'స్వాగతం',        // Telugu
-    'स्वागतम्',       // Sanskrit/Marathi
+    'Welcome',
+    'स्वागत है',
+    'ਸੁਆਗਤ ਹੈ',
+    'સ્વાગત છે',
+    'স্বাগতম',
+    'ಸ್ವಾಗತ',
+    'സ്വാഗതം',
+    'வரவேற்கிறோம்',
+    'స్వాగతం',
+    'स्वागतम्',
   ];
-
-  int _wordIndex = 0;
-  String _displayedText = '';
-  bool _isTyping = true;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTypewriter();
-  }
-
-  void _startTypewriter() {
-    _typeNextChar();
-  }
-
-  void _typeNextChar() {
-    final fullWord = _welcomeWords[_wordIndex];
-
-    if (_isTyping) {
-      if (_displayedText.length < fullWord.length) {
-        _timer = Timer(const Duration(milliseconds: 80), () {
-          if (!mounted) return;
-          setState(() {
-            _displayedText = fullWord.substring(0, _displayedText.length + 1);
-          });
-          _typeNextChar();
-        });
-      } else {
-        // Pause before erasing
-        _timer = Timer(const Duration(milliseconds: 1200), () {
-          if (!mounted) return;
-          setState(() => _isTyping = false);
-          _typeNextChar();
-        });
-      }
-    } else {
-      if (_displayedText.isNotEmpty) {
-        _timer = Timer(const Duration(milliseconds: 50), () {
-          if (!mounted) return;
-          setState(() {
-            _displayedText = _displayedText.substring(0, _displayedText.length - 1);
-          });
-          _typeNextChar();
-        });
-      } else {
-        // Move to next word
-        setState(() {
-          _wordIndex = (_wordIndex + 1) % _welcomeWords.length;
-          _isTyping = true;
-        });
-        _typeNextChar();
-      }
-    }
-  }
 
   @override
   void dispose() {
-    _timer?.cancel();
     _phoneController.dispose();
     super.dispose();
   }
@@ -136,20 +80,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Typewriter welcome text
                           Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _displayedText,
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
+                            child: AnimatedTextKit(
+                              animatedTexts: _welcomeWords.map((word) =>
+                                TypewriterAnimatedText(
+                                  word,
+                                  textStyle: GoogleFonts.dancingScript(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.w700,
                                     color: Colors.black,
                                   ),
+                                  speed: const Duration(milliseconds: 120),
+                                  cursor: '|',
                                 ),
-                                // Blinking cursor
-                                _BlinkingCursor(),
-                              ],
+                              ).toList(),
+                              repeatForever: true,
+                              pause: const Duration(milliseconds: 1800),
+                              displayFullTextOnTap: false,
                             ),
                           ),
 
@@ -298,41 +244,3 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class _BlinkingCursor extends StatefulWidget {
-  @override
-  State<_BlinkingCursor> createState() => _BlinkingCursorState();
-}
-
-class _BlinkingCursorState extends State<_BlinkingCursor> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _controller,
-      child: const Text(
-        '|',
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.w300,
-          color: AppTheme.primaryBlue,
-        ),
-      ),
-    );
-  }
-}
