@@ -176,8 +176,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   keyboardType: TextInputType.phone,
                                   decoration: const InputDecoration(
                                     hintText: 'Enter your phone number',
-                                    prefixText: '+91 ',
-                                    prefixStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                    prefixIcon: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text('+91', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                                    ),
+                                    prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
                                   ),
                                 ),
 
