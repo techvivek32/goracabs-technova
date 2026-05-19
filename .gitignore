@@ -1,0 +1,21 @@
+# Miscellaneous
+.DS_Store
+.apple
+.idea/
+.vscode/
+*.iml
+*.log
+*.swp
+*.tmp
+
+# Root level ignores
+node_modules/
+build/
+dist/
+
+# Flutter subfolder ignores (git will respect nested .gitignore files)
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.dart_tool/
+**/pubspec.lock
