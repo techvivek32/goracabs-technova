@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
-import 'home_screen.dart';
 import 'otp_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -18,21 +17,64 @@ class _SignupScreenState extends State<SignupScreen> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _idNumberController = TextEditingController();
+  final _cityFocusNode = FocusNode();
 
   bool _agreedToPolicy = false;
+  bool _showCityDropdown = false;
+  List<String> _filteredCities = [];
 
   File? _profilePhoto;
   File? _idPhoto;
   final _picker = ImagePicker();
 
-  Future<void> _pickProfilePhoto() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+  static const List<String> _indianCities = [
+    'Agra', 'Ahmedabad', 'Ajmer', 'Aligarh', 'Allahabad', 'Amritsar',
+    'Aurangabad', 'Bangalore', 'Bareilly', 'Bhopal', 'Bhubaneswar',
+    'Chandigarh', 'Chennai', 'Coimbatore', 'Dehradun', 'Delhi',
+    'Dhanbad', 'Faridabad', 'Ghaziabad', 'Goa', 'Gorakhpur',
+    'Gurugram', 'Guwahati', 'Gwalior', 'Hyderabad', 'Indore',
+    'Jabalpur', 'Jaipur', 'Jalandhar', 'Jammu', 'Jamshedpur',
+    'Jodhpur', 'Kanpur', 'Kochi', 'Kolkata', 'Kozhikode',
+    'Lucknow', 'Ludhiana', 'Madurai', 'Mangalore', 'Meerut',
+    'Mumbai', 'Mysore', 'Nagpur', 'Nashik', 'Navi Mumbai',
+    'Noida', 'Patna', 'Pune', 'Raipur', 'Rajkot',
+    'Ranchi', 'Srinagar', 'Surat', 'Thane', 'Thiruvananthapuram',
+    'Tiruchirappalli', 'Udaipur', 'Vadodara', 'Varanasi', 'Vijayawada',
+    'Visakhapatnam',
+  ];
+
+  Future<void> _captureProfilePhoto() async {
+    final picked = await _picker.pickImage(source: ImageSource.camera, imageQuality: 85);
     if (picked != null) setState(() => _profilePhoto = File(picked.path));
   }
 
   Future<void> _captureIdPhoto() async {
     final picked = await _picker.pickImage(source: ImageSource.camera, imageQuality: 90);
     if (picked != null) setState(() => _idPhoto = File(picked.path));
+  }
+
+  void _onCityChanged(String value) {
+    final query = value.trim().toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _showCityDropdown = false;
+        _filteredCities = [];
+      } else {
+        _filteredCities = _indianCities
+            .where((c) => c.toLowerCase().contains(query))
+            .toList();
+        _showCityDropdown = _filteredCities.isNotEmpty;
+      }
+    });
+  }
+
+  void _selectCity(String city) {
+    _cityController.text = city;
+    setState(() {
+      _showCityDropdown = false;
+      _filteredCities = [];
+    });
+    _cityFocusNode.unfocus();
   }
 
   void _showPrivacyPolicy() {
@@ -58,16 +100,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     children: [
                       Container(
                         width: 40, height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Privacy Policy',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
+                      const Text('Privacy Policy', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 16),
                       Expanded(
                         child: SingleChildScrollView(
@@ -116,9 +152,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Navigator.pop(context);
                                 }
                               : null,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
+                          style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                           child: const Text('Agree & Continue'),
                         ),
                       ),
@@ -133,8 +167,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  void _showPrivacyPolicyText() => _showPrivacyPolicy();
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -142,6 +174,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _phoneController.dispose();
     _emailController.dispose();
     _idNumberController.dispose();
+    _cityFocusNode.dispose();
     super.dispose();
   }
 
@@ -168,18 +201,13 @@ class _SignupScreenState extends State<SignupScreen> {
                 ).createShader(rect);
               },
               blendMode: BlendMode.dstIn,
-              child: Image.asset(
-                'assets/images/123456789.png',
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset('assets/images/123456789.png', fit: BoxFit.cover),
             ),
           ),
 
-          // Foreground
           SafeArea(
             child: Column(
               children: [
-                // Back button
                 Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
@@ -187,32 +215,44 @@ class _SignupScreenState extends State<SignupScreen> {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
 
-                        // Profile photo picker
+                        // Profile photo — camera only
                         GestureDetector(
-                          onTap: _pickProfilePhoto,
-                          child: CircleAvatar(
-                            radius: 48,
-                            backgroundColor: Colors.white,
-                            backgroundImage: _profilePhoto != null ? FileImage(_profilePhoto!) : null,
-                            child: _profilePhoto == null
-                                ? const Icon(Icons.add_a_photo, size: 32, color: AppTheme.primaryBlue)
-                                : null,
+                          onTap: _captureProfilePhoto,
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 48,
+                                backgroundColor: Colors.white,
+                                backgroundImage: _profilePhoto != null ? FileImage(_profilePhoto!) : null,
+                                child: _profilePhoto == null
+                                    ? const Icon(Icons.person, size: 40, color: Colors.grey)
+                                    : null,
+                              ),
+                              Positioned(
+                                bottom: 0, right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.primaryBlue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Profile Photo',
-                          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
-                        ),
+                        const SizedBox(height: 6),
+                        const Text('Tap to take photo',
+                            style: TextStyle(fontSize: 12, color: Colors.black54)),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
 
                         // White card
                         Container(
@@ -225,57 +265,80 @@ class _SignupScreenState extends State<SignupScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Create Account',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
+                              const Text('Create Account',
+                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 20),
 
                               _buildLabel('Full Name'),
-                              _buildField(
-                                controller: _nameController,
-                                hint: 'Enter your full name',
-                                icon: Icons.person_outline,
-                              ),
+                              _buildField(controller: _nameController, hint: 'Enter your full name', icon: Icons.person_outline),
                               const SizedBox(height: 16),
 
+                              // City with autocomplete
                               _buildLabel('City'),
-                              _buildField(
-                                controller: _cityController,
-                                hint: 'Enter your city',
-                                icon: Icons.location_city_outlined,
+                              Column(
+                                children: [
+                                  TextField(
+                                    controller: _cityController,
+                                    focusNode: _cityFocusNode,
+                                    onChanged: _onCityChanged,
+                                    decoration: InputDecoration(
+                                      hintText: 'Type to search city',
+                                      prefixIcon: const Icon(Icons.location_city_outlined),
+                                      suffixIcon: _cityController.text.isNotEmpty
+                                          ? IconButton(
+                                              icon: const Icon(Icons.clear, size: 18),
+                                              onPressed: () {
+                                                _cityController.clear();
+                                                _onCityChanged('');
+                                              },
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                  if (_showCityDropdown)
+                                    Container(
+                                      constraints: const BoxConstraints(maxHeight: 200),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [BoxShadow(color: Colors.black.withAlpha(30), blurRadius: 8, offset: const Offset(0, 4))],
+                                      ),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        padding: EdgeInsets.zero,
+                                        itemCount: _filteredCities.length,
+                                        itemBuilder: (_, i) {
+                                          final city = _filteredCities[i];
+                                          return InkWell(
+                                            onTap: () => _selectCity(city),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(Icons.location_on_outlined, size: 16, color: AppTheme.primaryBlue),
+                                                  const SizedBox(width: 10),
+                                                  Text(city, style: const TextStyle(fontSize: 14)),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                ],
                               ),
                               const SizedBox(height: 16),
 
                               _buildLabel('Phone Number'),
-                              _buildField(
-                                controller: _phoneController,
-                                hint: 'Enter your phone number',
-                                icon: Icons.phone_outlined,
-                                keyboardType: TextInputType.phone,
-                                showPrefix: true,
-                              ),
+                              _buildField(controller: _phoneController, hint: 'Enter your phone number', icon: Icons.phone_outlined, keyboardType: TextInputType.phone, showPrefix: true),
                               const SizedBox(height: 16),
 
                               _buildLabel('Mail ID'),
-                              _buildField(
-                                controller: _emailController,
-                                hint: 'Enter your email',
-                                icon: Icons.email_outlined,
-                                keyboardType: TextInputType.emailAddress,
-                              ),
+                              _buildField(controller: _emailController, hint: 'Enter your email', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
                               const SizedBox(height: 16),
 
                               _buildLabel('ID Number'),
-                              _buildField(
-                                controller: _idNumberController,
-                                hint: 'Enter your ID number',
-                                icon: Icons.badge_outlined,
-                              ),
+                              _buildField(controller: _idNumberController, hint: 'Enter your ID number', icon: Icons.badge_outlined),
                               const SizedBox(height: 16),
 
                               _buildLabel('ID Proof (Real-time capture)'),
@@ -299,10 +362,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                           children: [
                                             Icon(Icons.camera_alt_outlined, size: 32, color: AppTheme.primaryBlue),
                                             const SizedBox(height: 8),
-                                            Text(
-                                              'Tap to capture ID',
-                                              style: TextStyle(color: Colors.grey[500], fontSize: 13),
-                                            ),
+                                            Text('Tap to capture ID', style: TextStyle(color: Colors.grey[500], fontSize: 13)),
                                           ],
                                         )
                                       : null,
@@ -311,7 +371,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                               const SizedBox(height: 20),
 
-                              // Privacy Policy checkbox
+                              // Privacy policy checkbox
                               Row(
                                 children: [
                                   Checkbox(
@@ -349,16 +409,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: _agreedToPolicy
-                                      ? () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(builder: (context) => const OtpScreen()),
-                                          );
-                                        }
+                                      ? () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OtpScreen()))
                                       : null,
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
-                                  ),
+                                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                                   child: const Text('Create Account'),
                                 ),
                               ),
