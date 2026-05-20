@@ -11,6 +11,9 @@ class RentalScreen extends StatefulWidget {
 class _RentalScreenState extends State<RentalScreen> {
   String? _selectedPackage;
   final _pickupController = TextEditingController();
+  final _dropController = TextEditingController();
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
 
   final List<Map<String, dynamic>> _packages = [
     {'duration': '4 Hours', 'distance': '40 km', 'price': '₹800', 'icon': Icons.schedule},
@@ -34,7 +37,13 @@ class _RentalScreenState extends State<RentalScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLocationField(Icons.radio_button_checked, 'Pickup Location', _pickupController),
+                  const Text('Pickup Location', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 12),
+                  _buildLocationField(Icons.radio_button_checked, 'Enter pickup location', _pickupController),
+                  const SizedBox(height: 16),
+                  const Text('Drop Location', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 12),
+                  _buildLocationField(Icons.location_on, 'Enter drop location', _dropController),
                   const SizedBox(height: 24),
                   const Text('Select Date & Time', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
@@ -42,18 +51,40 @@ class _RentalScreenState extends State<RentalScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime.now().add(const Duration(days: 365)),
+                            );
+                            if (date != null) {
+                              setState(() => _selectedDate = date);
+                            }
+                          },
                           icon: const Icon(Icons.calendar_today, size: 18),
-                          label: const Text('Select Date'),
+                          label: Text(_selectedDate == null 
+                            ? 'Select Date' 
+                            : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'),
                           style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (time != null) {
+                              setState(() => _selectedTime = time);
+                            }
+                          },
                           icon: const Icon(Icons.access_time, size: 18),
-                          label: const Text('Select Time'),
+                          label: Text(_selectedTime == null 
+                            ? 'Select Time' 
+                            : _selectedTime!.format(context)),
                           style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                         ),
                       ),

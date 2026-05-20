@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
 import 'taxi_booking_screen.dart';
 import 'outstation_screen.dart';
@@ -10,6 +12,7 @@ import 'support_screen.dart';
 import 'settings_screen.dart';
 import 'profile_screen.dart';
 import 'offers_screen.dart';
+import 'service_selection_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _hasOngoingRide = true;
+  final MapController _mapController = MapController();
 
   final List<Map<String, dynamic>> _services = [
     {'icon': Icons.local_taxi, 'label': 'Taxi', 'color': Color(0xFF0052CC)},
@@ -46,19 +50,35 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: _buildDrawer(),
       body: Stack(
         children: [
-          // Map Placeholder
-          Container(
-            color: Colors.grey[300],
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.map, size: 80, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text('Map View', style: TextStyle(fontSize: 18, color: Colors.grey[600])),
+          // OpenStreetMap using flutter_map
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: LatLng(28.6139, 77.2090),
+              initialZoom: 14.0,
+              minZoom: 5.0,
+              maxZoom: 18.0,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.goracabs.customer_app',
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: LatLng(28.6139, 77.2090),
+                    width: 40,
+                    height: 40,
+                    child: Icon(
+                      Icons.location_on,
+                      color: AppTheme.primaryBlue,
+                      size: 40,
+                    ),
+                  ),
                 ],
               ),
-            ),
+            ],
           ),
 
           // Top bar
@@ -143,8 +163,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
 
                     // Services grid
-                    const Text('Our Services',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Our Services',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceSelectionScreen()));
+                          },
+                          child: Text('View All',
+                              style: TextStyle(fontSize: 14, color: AppTheme.primaryBlue, fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 14),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

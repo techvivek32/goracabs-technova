@@ -10,8 +10,10 @@ class OutstationScreen extends StatefulWidget {
 
 class _OutstationScreenState extends State<OutstationScreen> {
   String _tripType = 'One Way';
-  final _fromController = TextEditingController();
-  final _toController = TextEditingController();
+  final _pickupController = TextEditingController();
+  final _dropController = TextEditingController();
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +41,13 @@ class _OutstationScreenState extends State<OutstationScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  _buildLocationField(Icons.radio_button_checked, 'From City', _fromController),
+                  const Text('Pickup Location', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 12),
+                  _buildLocationField(Icons.radio_button_checked, 'Enter pickup city', _pickupController),
                   const SizedBox(height: 16),
-                  _buildLocationField(Icons.location_on, 'To City', _toController),
+                  const Text('Drop Location', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 12),
+                  _buildLocationField(Icons.location_on, 'Enter drop city', _dropController),
                   const SizedBox(height: 24),
                   const Text('Select Date & Time', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
@@ -49,18 +55,40 @@ class _OutstationScreenState extends State<OutstationScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime.now().add(const Duration(days: 365)),
+                            );
+                            if (date != null) {
+                              setState(() => _selectedDate = date);
+                            }
+                          },
                           icon: const Icon(Icons.calendar_today, size: 18),
-                          label: const Text('Select Date'),
+                          label: Text(_selectedDate == null 
+                            ? 'Select Date' 
+                            : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'),
                           style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (time != null) {
+                              setState(() => _selectedTime = time);
+                            }
+                          },
                           icon: const Icon(Icons.access_time, size: 18),
-                          label: const Text('Select Time'),
+                          label: Text(_selectedTime == null 
+                            ? 'Select Time' 
+                            : _selectedTime!.format(context)),
                           style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                         ),
                       ),
