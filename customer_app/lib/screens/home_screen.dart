@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import 'booking_screen.dart';
+import 'taxi_booking_screen.dart';
+import 'outstation_screen.dart';
+import 'rental_screen.dart';
+import 'hire_driver_screen.dart';
 import 'wallet_screen.dart';
 import 'ride_history_screen.dart';
 import 'support_screen.dart';
-import 'service_selection_screen.dart';
 import 'settings_screen.dart';
 import 'profile_screen.dart';
 import 'offers_screen.dart';
@@ -21,9 +23,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Map<String, dynamic>> _services = [
     {'icon': Icons.local_taxi, 'label': 'Taxi', 'color': Color(0xFF0052CC)},
-    {'icon': Icons.delivery_dining, 'label': 'Delivery', 'color': Color(0xFFE65100)},
-    {'icon': Icons.directions_car, 'label': 'Rental', 'color': Color(0xFF2E7D32)},
-    {'icon': Icons.person_pin, 'label': 'Hire Driver', 'color': Color(0xFF6A1B9A)},
+    {'icon': Icons.route, 'label': 'Outstation', 'color': Color(0xFF0052CC)},
+    {'icon': Icons.schedule, 'label': 'Rental', 'color': Color(0xFF0052CC)},
+    {'icon': Icons.person_pin, 'label': 'Hire Driver', 'color': Color(0xFF0052CC)},
   ];
 
   final List<Map<String, String>> _recentPlaces = [
@@ -208,9 +210,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         if (s['label'] == 'Taxi') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingScreen()));
-        } else {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceSelectionScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxiBookingScreen()));
+        } else if (s['label'] == 'Outstation') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const OutstationScreen()));
+        } else if (s['label'] == 'Rental') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const RentalScreen()));
+        } else if (s['label'] == 'Hire Driver') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const HireDriverScreen()));
         }
       },
       child: Column(
