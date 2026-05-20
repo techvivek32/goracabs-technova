@@ -92,29 +92,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Where are you going?',
+                        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
+                        prefixIcon: const Icon(Icons.search, color: AppTheme.primaryBlue, size: 20),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(30),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            )
-                          ],
+                          borderSide: BorderSide.none,
                         ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.search, color: AppTheme.primaryBlue, size: 20),
-                            const SizedBox(width: 10),
-                            Text('Where are you going?',
-                                style: TextStyle(color: Colors.grey[500], fontSize: 15)),
-                          ],
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
                     ),
                   ),
