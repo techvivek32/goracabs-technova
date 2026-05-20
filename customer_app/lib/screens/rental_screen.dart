@@ -16,9 +16,9 @@ class _RentalScreenState extends State<RentalScreen> {
   TimeOfDay? _selectedTime;
 
   final List<Map<String, dynamic>> _packages = [
-    {'duration': '4 Hours', 'distance': '40 km', 'price': '₹800', 'icon': Icons.schedule},
-    {'duration': '8 Hours', 'distance': '80 km', 'price': '₹1,500', 'icon': Icons.schedule},
-    {'duration': '12 Hours', 'distance': '120 km', 'price': '₹2,200', 'icon': Icons.schedule},
+    {'duration': '4 Hours', 'distance': '40 km', 'price': '₹800', 'icon': Icons.schedule, 'color': Color(0xFF2196F3)},
+    {'duration': '8 Hours', 'distance': '80 km', 'price': '₹1,500', 'icon': Icons.schedule, 'color': Color(0xFF4CAF50)},
+    {'duration': '12 Hours', 'distance': '120 km', 'price': '₹2,200', 'icon': Icons.schedule, 'color': Color(0xFFFF9800)},
   ];
 
   @override
@@ -26,8 +26,9 @@ class _RentalScreenState extends State<RentalScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rental Package'),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: Color(0xFF2196F3),
         foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
@@ -98,27 +99,42 @@ class _RentalScreenState extends State<RentalScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryBlue.withAlpha(30),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.check_circle, color: AppTheme.primaryBlue, size: 20),
-                            SizedBox(width: 8),
-                            Text('Package Benefits', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Color(0xFF4CAF50).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 20),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Package Benefits', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                           ],
                         ),
-                        SizedBox(height: 12),
-                        Text('• Unlimited stops within package', style: TextStyle(fontSize: 13)),
-                        SizedBox(height: 6),
-                        Text('• Fixed pricing, no surge', style: TextStyle(fontSize: 13)),
-                        SizedBox(height: 6),
-                        Text('• Extra km charged at ₹12/km', style: TextStyle(fontSize: 13)),
-                        SizedBox(height: 6),
-                        Text('• Extra hour charged at ₹150/hr', style: TextStyle(fontSize: 13)),
+                        const SizedBox(height: 12),
+                        Text('• Unlimited stops within package', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                        const SizedBox(height: 4),
+                        Text('• Fixed pricing, no surge', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                        const SizedBox(height: 4),
+                        Text('• Extra km charged at ₹12/km', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                        const SizedBox(height: 4),
+                        Text('• Extra hour charged at ₹150/hr', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
                       ],
                     ),
                   ),
@@ -135,11 +151,11 @@ class _RentalScreenState extends State<RentalScreen> {
             child: ElevatedButton(
               onPressed: _selectedPackage == null ? null : () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryBlue,
+                backgroundColor: Color(0xFF2196F3),
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Book Package', style: TextStyle(fontSize: 16, color: Colors.white)),
+              child: const Text('Book Package', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -149,15 +165,22 @@ class _RentalScreenState extends State<RentalScreen> {
 
   Widget _buildLocationField(IconData icon, String hint, TextEditingController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.primaryBlue, size: 20),
+          Icon(icon, color: Color(0xFF2196F3), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
@@ -182,19 +205,34 @@ class _RentalScreenState extends State<RentalScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue.withAlpha(30) : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!, width: isSelected ? 2 : 1),
+          border: Border.all(
+            color: isSelected ? Color(0xFF2196F3) : Colors.grey[300]!, 
+            width: isSelected ? 2 : 1
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected 
+                ? Color(0xFF2196F3).withOpacity(0.2)
+                : Colors.black.withOpacity(0.05),
+              blurRadius: isSelected ? 8 : 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primaryBlue : Colors.grey[200],
+                color: (p['color'] as Color).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (p['color'] as Color).withOpacity(0.3),
+                ),
               ),
-              child: Icon(p['icon'], color: isSelected ? Colors.white : AppTheme.textGrey, size: 28),
+              child: Icon(p['icon'], color: p['color'] as Color, size: 28),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -203,11 +241,11 @@ class _RentalScreenState extends State<RentalScreen> {
                 children: [
                   Text(p['duration'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   const SizedBox(height: 2),
-                  Text('Up to ${p['distance']}', style: const TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                  Text('Up to ${p['distance']}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                 ],
               ),
             ),
-            Text(p['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryBlue)),
+            Text(p['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
           ],
         ),
       ),

@@ -20,8 +20,9 @@ class _OutstationScreenState extends State<OutstationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Outstation Trip'),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: Color(0xFF2196F3),
         foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
@@ -98,17 +99,32 @@ class _OutstationScreenState extends State<OutstationScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryBlue.withAlpha(30),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Estimated Fare', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                        SizedBox(height: 8),
-                        Text('₹2,500 - ₹4,000', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
-                        SizedBox(height: 8),
-                        Text('For approx. 250 km', style: TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                        const Text('Estimated Fare', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF2196F3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text('₹2,500 - ₹4,000', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        ),
+                        const SizedBox(height: 8),
+                        Text('For approx. 250 km', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                       ],
                     ),
                   ),
@@ -125,11 +141,11 @@ class _OutstationScreenState extends State<OutstationScreen> {
             child: ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryBlue,
+                backgroundColor: Color(0xFF2196F3),
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Search Cabs', style: TextStyle(fontSize: 16, color: Colors.white)),
+              child: const Text('Search Cabs', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -144,9 +160,16 @@ class _OutstationScreenState extends State<OutstationScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue : Colors.white,
+          color: isSelected ? Color(0xFF2196F3) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!),
+          border: Border.all(color: isSelected ? Color(0xFF2196F3) : Colors.grey[300]!),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: Color(0xFF2196F3).withOpacity(0.2),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
         ),
         child: Center(
           child: Text(
@@ -163,15 +186,22 @@ class _OutstationScreenState extends State<OutstationScreen> {
 
   Widget _buildLocationField(IconData icon, String hint, TextEditingController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.primaryBlue, size: 20),
+          Icon(icon, color: Color(0xFF2196F3), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(

@@ -15,10 +15,10 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   final _dropController = TextEditingController();
 
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Gora Go', 'type': 'Mini', 'price': '₹120', 'eta': '2 min', 'capacity': '4', 'icon': Icons.directions_car},
-    {'name': 'Gora Sedan', 'type': 'Premium', 'price': '₹180', 'eta': '3 min', 'capacity': '4', 'icon': Icons.directions_car},
-    {'name': 'Gora SUV', 'type': 'SUV', 'price': '₹250', 'eta': '5 min', 'capacity': '6', 'icon': Icons.airport_shuttle},
-    {'name': 'Gora Luxury', 'type': 'Luxury', 'price': '₹400', 'eta': '8 min', 'capacity': '4', 'icon': Icons.car_rental},
+    {'name': 'Gora Go', 'type': 'Mini', 'price': '₹120', 'eta': '2 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3)},
+    {'name': 'Gora Sedan', 'type': 'Premium', 'price': '₹180', 'eta': '3 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50)},
+    {'name': 'Gora SUV', 'type': 'SUV', 'price': '₹250', 'eta': '5 min', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFFFF9800)},
+    {'name': 'Gora Luxury', 'type': 'Luxury', 'price': '₹400', 'eta': '8 min', 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF9C27B0)},
   ];
 
   @override
@@ -26,8 +26,9 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Book a Taxi'),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: Color(0xFF2196F3),
         foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
@@ -45,15 +46,26 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                     children: [
                       const Text('Estimated Fare:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const Spacer(),
-                      Text('₹120 - ₹400', style: TextStyle(fontSize: 18, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF2196F3),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text('₹120 - ₹400', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Text('Distance:', style: TextStyle(fontSize: 14, color: AppTheme.textGrey)),
+                      Icon(Icons.route, color: Colors.grey[600], size: 16),
+                      const SizedBox(width: 8),
+                      Text('Distance: 8.5 km', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                       const Spacer(),
-                      Text('8.5 km', style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                      Icon(Icons.access_time, color: Colors.grey[600], size: 16),
+                      const SizedBox(width: 8),
+                      Text('ETA: 15-20 min', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -80,11 +92,11 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryBlue,
+                          backgroundColor: Color(0xFF2196F3),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('Book Now', style: TextStyle(fontSize: 16, color: Colors.white)),
+                        child: const Text('Book Now', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -94,11 +106,11 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
                         },
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppTheme.primaryBlue),
+                          side: const BorderSide(color: Color(0xFF2196F3), width: 2),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('Get Bids', style: TextStyle(fontSize: 16, color: AppTheme.primaryBlue)),
+                        child: const Text('Get Bids', style: TextStyle(fontSize: 16, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
                       ),
                     ),
                   ],
@@ -113,15 +125,22 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
 
   Widget _buildLocationInput(IconData icon, String hint, TextEditingController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.primaryBlue, size: 20),
+          Icon(icon, color: Color(0xFF2196F3), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
@@ -146,19 +165,34 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue.withAlpha(20) : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!, width: isSelected ? 2 : 1),
+          border: Border.all(
+            color: isSelected ? Color(0xFF2196F3) : Colors.grey[300]!, 
+            width: isSelected ? 2 : 1
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected 
+                ? Color(0xFF2196F3).withOpacity(0.2)
+                : Colors.black.withOpacity(0.05),
+              blurRadius: isSelected ? 8 : 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primaryBlue : Colors.grey[200],
+                color: (v['color'] as Color).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (v['color'] as Color).withOpacity(0.3),
+                ),
               ),
-              child: Icon(v['icon'], color: isSelected ? Colors.white : AppTheme.textGrey, size: 28),
+              child: Icon(v['icon'], color: v['color'] as Color, size: 28),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -167,16 +201,23 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                 children: [
                   Text(v['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   const SizedBox(height: 2),
-                  Text('${v['type']} • ${v['capacity']} seats', style: const TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                  Text('${v['type']} • ${v['capacity']} seats', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(v['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(v['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
                 const SizedBox(height: 2),
-                Text(v['eta'], style: const TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF4CAF50).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(v['eta'], style: const TextStyle(fontSize: 11, color: Color(0xFF4CAF50), fontWeight: FontWeight.w600)),
+                ),
               ],
             ),
           ],

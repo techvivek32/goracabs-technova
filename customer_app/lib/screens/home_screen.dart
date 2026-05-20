@@ -26,10 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final MapController _mapController = MapController();
 
   final List<Map<String, dynamic>> _services = [
-    {'icon': Icons.local_taxi, 'label': 'Taxi', 'color': AppTheme.primaryPurple, 'gradient': AppTheme.primaryGradient},
-    {'icon': Icons.route, 'label': 'Outstation', 'color': AppTheme.secondaryBlue, 'gradient': AppTheme.primaryGradient},
-    {'icon': Icons.schedule, 'label': 'Rental', 'color': AppTheme.accentGreen, 'gradient': AppTheme.successGradient},
-    {'icon': Icons.person_pin, 'label': 'Hire Driver', 'color': AppTheme.accentOrange, 'gradient': AppTheme.accentGradient},
+    {'icon': Icons.local_taxi, 'label': 'Taxi', 'color': Color(0xFF2196F3)},
+    {'icon': Icons.route, 'label': 'Outstation', 'color': Color(0xFF4CAF50)},
+    {'icon': Icons.schedule, 'label': 'Rental', 'color': Color(0xFFFF9800)},
+    {'icon': Icons.person_pin, 'label': 'Hire Driver', 'color': Color(0xFF9C27B0)},
   ];
 
   final List<Map<String, String>> _recentPlaces = [
@@ -39,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   final List<Map<String, String>> _promos = [
-    {'title': '50% OFF your first ride!', 'sub': 'Use code: GORA50', 'color': '0xFF6C5CE7'},
-    {'title': 'Free Delivery today', 'sub': 'On orders above ₹200', 'color': '0xFFFF7675'},
-    {'title': 'Refer & Earn ₹100', 'sub': 'Invite friends to Gora Cabs', 'color': '0xFF00B894'},
+    {'title': '50% OFF your first ride!', 'sub': 'Use code: GORA50', 'color': '0xFF2196F3'},
+    {'title': 'Free Delivery today', 'sub': 'On orders above ₹200', 'color': '0xFF4CAF50'},
+    {'title': 'Refer & Earn ₹100', 'sub': 'Invite friends to Gora Cabs', 'color': '0xFFFF9800'},
   ];
 
   @override
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 40,
                     child: Icon(
                       Icons.location_on,
-                      color: AppTheme.primaryPurple,
+                      color: Color(0xFF2196F3),
                       size: 40,
                     ),
                   ),
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: InputDecoration(
                         hintText: 'Where are you going?',
                         hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
-                        prefixIcon: const Icon(Icons.search, color: AppTheme.primaryPurple, size: 20),
+                        prefixIcon: const Icon(Icons.search, color: Color(0xFF2196F3), size: 20),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -123,13 +123,13 @@ class _HomeScreenState extends State<HomeScreen> {
               return Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black12, 
-                      blurRadius: 24, 
-                      spreadRadius: 4,
-                      offset: Offset(0, -4),
+                      blurRadius: 10, 
+                      spreadRadius: 1,
+                      offset: Offset(0, -2),
                     )
                   ],
                 ),
@@ -141,11 +141,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     Center(
                       child: Container(
                         margin: const EdgeInsets.symmetric(vertical: 12),
-                        width: 50,
-                        height: 6,
+                        width: 40,
+                        height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(3),
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
                     ),
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceSelectionScreen()));
                           },
                           child: Text('View All',
-                              style: TextStyle(fontSize: 14, color: AppTheme.primaryPurple, fontWeight: FontWeight.w600)),
+                              style: TextStyle(fontSize: 14, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
@@ -227,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           ],
         ),
-        child: Icon(icon, color: AppTheme.primaryPurple, size: 22),
+        child: Icon(icon, color: Color(0xFF2196F3), size: 22),
       ),
     );
   }
@@ -248,24 +248,21 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Container(
-            width: 68,
-            height: 68,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              gradient: s['gradient'] as LinearGradient,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: (s['color'] as Color).withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              color: (s['color'] as Color).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: (s['color'] as Color).withOpacity(0.3),
+                width: 1,
+              ),
             ),
-            child: Icon(s['icon'] as IconData, color: Colors.white, size: 32),
+            child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 28),
           ),
           const SizedBox(height: 8),
           Text(s['label'] as String,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textDark)),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
         ],
       ),
     );
@@ -275,13 +272,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
-        borderRadius: BorderRadius.circular(20),
+        color: Color(0xFF2196F3),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryPurple.withOpacity(0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: Color(0xFF2196F3).withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -326,20 +323,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPromoBanner(Map<String, String> promo) {
     final color = Color(int.parse(promo['color']!));
     return Container(
-      width: 240,
-      padding: const EdgeInsets.all(20),
+      width: 220,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color, color.withOpacity(0.8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: color,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: color.withOpacity(0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -349,10 +342,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(promo['title']!,
               style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-          const SizedBox(height: 6),
+                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+          const SizedBox(height: 4),
           Text(promo['sub']!,
-              style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13)),
+              style: const TextStyle(color: Colors.white70, fontSize: 12)),
         ],
       ),
     );
@@ -367,19 +360,19 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          gradient: AppTheme.primaryGradient,
-          borderRadius: BorderRadius.circular(16),
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(iconMap[place['icon']] ?? Icons.place_outlined,
-            color: Colors.white, size: 20),
+            color: Color(0xFF2196F3), size: 20),
       ),
       title: Text(place['name']!,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppTheme.textDark)),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.black87)),
       subtitle: Text(place['address']!,
-          style: const TextStyle(fontSize: 13, color: AppTheme.textMedium)),
-      trailing: const Icon(Icons.north_west, size: 18, color: AppTheme.textLight),
+          style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+      trailing: Icon(Icons.north_west, size: 16, color: Colors.grey[500]),
       onTap: () {},
     );
   }
@@ -390,10 +383,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(24, 60, 24, 28),
-            decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-            ),
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 24),
+            color: Color(0xFF2196F3),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -466,8 +457,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _drawerItem(IconData icon, String title, {Color? color, VoidCallback? onTap}) {
     return ListTile(
-      leading: Icon(icon, color: color ?? AppTheme.textMedium, size: 24),
-      title: Text(title, style: TextStyle(fontSize: 16, color: color ?? AppTheme.textDark, fontWeight: FontWeight.w500)),
+      leading: Icon(icon, color: color ?? Colors.grey[600], size: 22),
+      title: Text(title, style: TextStyle(fontSize: 15, color: color ?? Colors.black87, fontWeight: FontWeight.w500)),
       onTap: onTap ?? () => Navigator.pop(context),
     );
   }

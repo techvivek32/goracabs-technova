@@ -32,8 +32,9 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Hire Driver'),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: Color(0xFF2196F3),
         foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
@@ -46,14 +47,29 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryBlue.withAlpha(30),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.info_outline, color: AppTheme.primaryBlue),
-                        SizedBox(width: 12),
-                        Expanded(
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF2196F3).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.info_outline, color: Color(0xFF2196F3)),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
                           child: Text(
                             'Use your own car with our professional drivers',
                             style: TextStyle(fontSize: 13),
@@ -169,11 +185,11 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
             child: ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryBlue,
+                backgroundColor: Color(0xFF2196F3),
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Hire Driver', style: TextStyle(fontSize: 16, color: Colors.white)),
+              child: const Text('Hire Driver', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -188,9 +204,16 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue : Colors.white,
+          color: isSelected ? Color(0xFF2196F3) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!),
+          border: Border.all(color: isSelected ? Color(0xFF2196F3) : Colors.grey[300]!),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: Color(0xFF2196F3).withOpacity(0.2),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
         ),
         child: Center(
           child: Text(
@@ -207,15 +230,22 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
 
   Widget _buildLocationField(IconData icon, String hint, TextEditingController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.primaryBlue, size: 20),
+          Icon(icon, color: Color(0xFF2196F3), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
@@ -240,22 +270,32 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppTheme.primaryBlue.withAlpha(30),
+              color: Color(0xFF2196F3).withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Color(0xFF2196F3).withOpacity(0.3),
+              ),
             ),
-            child: const Icon(Icons.person_pin, color: AppTheme.primaryBlue, size: 28),
+            child: const Icon(Icons.person_pin, color: Color(0xFF2196F3), size: 28),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Text(option['duration'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           ),
-          Text(option['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryBlue)),
+          Text(option['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
         ],
       ),
     );
