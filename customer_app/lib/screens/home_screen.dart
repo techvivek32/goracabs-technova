@@ -22,14 +22,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _hasOngoingRide = true;
   int _currentIndex = 0;
-  bool _showRecentLocations = false;
-  final FocusNode _searchFocusNode = FocusNode();
 
   final List<Map<String, dynamic>> _services = [
     {'icon': 'assets/images/texi.png', 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
     {'icon': 'assets/images/outstation.png', 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
     {'icon': 'assets/images/rental.png', 'label': 'Rental', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
     {'icon': 'assets/images/hiredriver.png', 'label': 'Hire Driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
+    {'icon': 'assets/images/parcel.jpg', 'label': 'Parcel', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/texi20.png', 'label': 'Mini Ride', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
+    {'icon': 'assets/images/texi3.png', 'label': 'Prime Ride', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
+    {'icon': 'assets/images/query.jpg', 'label': 'Any Enquiry', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
   ];
 
   final List<Map<String, String>> _recentLocations = [
@@ -52,16 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _searchFocusNode.addListener(() {
-      setState(() {
-        _showRecentLocations = _searchFocusNode.hasFocus;
-      });
-    });
   }
 
   @override
   void dispose() {
-    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -184,16 +180,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 child: TextField(
-                  focusNode: _searchFocusNode,
                   onTap: () {
-                    setState(() {
-                      _showRecentLocations = true;
-                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TaxiBookingScreen(
+                          fromLocation: 'Current Location',
+                          hideLocationInputs: true,
+                        ),
+                      ),
+                    );
                   },
+                  readOnly: true,
                   decoration: InputDecoration(
                     hintText: 'Where are you going?',
                     hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
                     prefixIcon: const Icon(Icons.search, color: AppTheme.primaryBlue, size: 22),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        print('Search arrow tapped');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => TaxiBookingScreen(
+                              fromLocation: 'Current Location',
+                              hideLocationInputs: true,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_forward, color: AppTheme.primaryBlue, size: 22),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -214,39 +231,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (_showRecentLocations) ...[
-                      Container(
-                        color: Color(0xFFF8F8F8),
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                        child: Column(
-                          children: _recentLocations.asMap().entries.map((entry) {
-                            final index = entry.key;
-                            final loc = entry.value;
-                            return Column(
-                              children: [
-                                _buildRecentItem(loc),
-                                if (index < _recentLocations.length - 1)
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                    child: Row(
-                                      children: [
-                                        const SizedBox(width: 32),
-                                        Expanded(
-                                          child: CustomPaint(
-                                            size: const Size(double.infinity, 1),
-                                            painter: DottedLinePainter(),
-                                          ),
+                    Container(
+                      color: Color(0xFFF8F8F8),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      child: Column(
+                        children: _recentLocations.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final loc = entry.value;
+                          return Column(
+                            children: [
+                              _buildRecentItem(loc),
+                              if (index < _recentLocations.length - 1)
+                                Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 8),
+                                  child: Row(
+                                    children: [
+                                      const SizedBox(width: 32),
+                                      Expanded(
+                                        child: CustomPaint(
+                                          size: const Size(double.infinity, 1),
+                                          painter: DottedLinePainter(),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
+                                ),
+                            ],
+                          );
+                        }).toList(),
                       ),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
+                    const SizedBox(height: 24),
                     
                     const Text('Popular Places', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
@@ -280,7 +295,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 14),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: _services.map((s) => _buildServiceItem(s)).toList(),
+                      children: _services.take(4).map((s) => _buildServiceItem(s)).toList(),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: _services.skip(4).take(4).map((s) => _buildServiceItem(s)).toList(),
                     ),
 
                     const SizedBox(height: 24),
@@ -297,6 +317,77 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    
+                    // Footer section
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.grey[50]!,
+                            Colors.grey[100]!,
+                          ],
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          // Background pattern
+                          Positioned.fill(
+                            child: CustomPaint(
+                              painter: RajasthaniPatternPainter(),
+                            ),
+                          ),
+                          // Content
+                          Column(
+                            children: [
+                              Text(
+                                'Gora Cabs',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[400],
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.favorite, color: Colors.red[400], size: 16),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Made in India',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.location_on, color: Colors.orange[400], size: 16),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Crafted in Rajasthan',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -308,37 +399,47 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecentItem(Map<String, String> location) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(Icons.access_time, color: Colors.grey[600], size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  location['name']!,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  location['address']!,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+    return GestureDetector(
+      onTap: () {
+        print('Recent location tapped: ${location['name']}');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => TaxiBookingScreen(
+              fromLocation: 'Current Location',
+              toLocation: location['address']!,
+              hideLocationInputs: true,
             ),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.favorite_border, color: Colors.grey[600], size: 20),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-        ],
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Icon(Icons.access_time, color: Colors.grey[600], size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    location['name']!,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    location['address']!,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -433,6 +534,14 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const RentalScreen()));
         } else if (s['label'] == 'Hire Driver') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const HireDriverScreen()));
+        } else {
+          // For new services, show a coming soon message or navigate to a placeholder
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${s['label']} service coming soon!'),
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+          );
         }
       },
       child: Column(
@@ -713,6 +822,97 @@ class DottedLinePainter extends CustomPainter {
         paint,
       );
       startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class RajasthaniPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.orange.withOpacity(0.08)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final fillPaint = Paint()
+      ..color = Colors.orange.withOpacity(0.03)
+      ..style = PaintingStyle.fill;
+
+    // Draw palace-inspired arches and geometric patterns
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
+    // Draw decorative arches (like palace windows)
+    for (int i = 0; i < 3; i++) {
+      final x = (size.width / 4) * (i + 0.5);
+      final archRect = Rect.fromCenter(
+        center: Offset(x, centerY - 10),
+        width: 40,
+        height: 25,
+      );
+      
+      // Draw arch
+      canvas.drawArc(archRect, 0, 3.14159, false, paint);
+      canvas.drawArc(archRect, 0, 3.14159, false, fillPaint);
+      
+      // Draw small decorative circles (like palace domes)
+      canvas.drawCircle(Offset(x, centerY - 22), 3, paint);
+      canvas.drawCircle(Offset(x, centerY - 22), 3, fillPaint);
+    }
+
+    // Draw geometric border patterns
+    final borderPaint = Paint()
+      ..color = Colors.orange.withOpacity(0.06)
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    // Top border pattern
+    for (double x = 0; x < size.width; x += 20) {
+      canvas.drawLine(
+        Offset(x, 5),
+        Offset(x + 10, 15),
+        borderPaint,
+      );
+      canvas.drawLine(
+        Offset(x + 10, 15),
+        Offset(x + 20, 5),
+        borderPaint,
+      );
+    }
+
+    // Bottom border pattern
+    for (double x = 0; x < size.width; x += 20) {
+      canvas.drawLine(
+        Offset(x, size.height - 5),
+        Offset(x + 10, size.height - 15),
+        borderPaint,
+      );
+      canvas.drawLine(
+        Offset(x + 10, size.height - 15),
+        Offset(x + 20, size.height - 5),
+        borderPaint,
+      );
+    }
+
+    // Side decorative elements
+    final sidePaint = Paint()
+      ..color = Colors.orange.withOpacity(0.05)
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    // Left side pattern
+    for (double y = 20; y < size.height - 20; y += 15) {
+      canvas.drawCircle(Offset(10, y), 2, sidePaint);
+      canvas.drawLine(Offset(5, y), Offset(15, y), sidePaint);
+    }
+
+    // Right side pattern
+    for (double y = 20; y < size.height - 20; y += 15) {
+      canvas.drawCircle(Offset(size.width - 10, y), 2, sidePaint);
+      canvas.drawLine(Offset(size.width - 15, y), Offset(size.width - 5, y), sidePaint);
     }
   }
 

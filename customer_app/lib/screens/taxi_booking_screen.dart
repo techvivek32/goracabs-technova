@@ -5,7 +5,16 @@ import '../theme/app_theme.dart';
 import 'booking_screen.dart';
 
 class TaxiBookingScreen extends StatefulWidget {
-  const TaxiBookingScreen({super.key});
+  final String? fromLocation;
+  final String? toLocation;
+  final bool hideLocationInputs;
+  
+  const TaxiBookingScreen({
+    super.key,
+    this.fromLocation,
+    this.toLocation,
+    this.hideLocationInputs = false,
+  });
 
   @override
   State<TaxiBookingScreen> createState() => _TaxiBookingScreenState();
@@ -17,13 +26,65 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   final _dropController = TextEditingController();
   bool _showLocationInputs = true;
 
+  @override
+  void initState() {
+    super.initState();
+    // Set initial values and visibility based on parameters
+    if (widget.fromLocation != null) {
+      _pickupController.text = widget.fromLocation!;
+    }
+    if (widget.toLocation != null) {
+      _dropController.text = widget.toLocation!;
+    }
+    if (widget.hideLocationInputs) {
+      _showLocationInputs = false;
+    }
+  }
+
+  // Bike locations near user
+  final List<LatLng> _bikeLocations = [
+    LatLng(28.6139, 77.2090),
+    LatLng(28.6150, 77.2100),
+    LatLng(28.6120, 77.2080),
+    LatLng(28.6160, 77.2110),
+    LatLng(28.6130, 77.2070),
+    LatLng(28.6170, 77.2120),
+  ];
+
+  // Auto locations near user
+  final List<LatLng> _autoLocations = [
+    LatLng(28.6145, 77.2095),
+    LatLng(28.6155, 77.2085),
+    LatLng(28.6125, 77.2105),
+    LatLng(28.6165, 77.2075),
+    LatLng(28.6135, 77.2115),
+  ];
+
+  // Economy car locations (4 cars)
+  final List<LatLng> _economyLocations = [
+    LatLng(28.6140, 77.2095),
+    LatLng(28.6158, 77.2088),
+    LatLng(28.6122, 77.2102),
+    LatLng(28.6162, 77.2078),
+  ];
+
+  // SUV locations (2 cars)
+  final List<LatLng> _suvLocations = [
+    LatLng(28.6148, 77.2092),
+    LatLng(28.6152, 77.2098),
+  ];
+
+  // Premium car locations (1 car)
+  final List<LatLng> _premiumLocations = [
+    LatLng(28.6145, 77.2090),
+  ];
+
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Bike', 'type': 'Quick Rides', 'price': '₹49', 'eta': '2 min', 'capacity': '1', 'icon': Icons.two_wheeler, 'color': Color(0xFFFF9800), 'image': 'https://cdn-icons-png.flaticon.com/512/2972/2972185.png'},
-    {'name': 'Auto', 'type': 'Affordable', 'price': '₹76', 'eta': '3 min', 'capacity': '3', 'icon': Icons.electric_rickshaw, 'color': Color(0xFF4CAF50), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097136.png'},
-    {'name': 'Cab Economy', 'type': 'Comfortable', 'price': '₹144', 'eta': '4 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'https://cdn-icons-png.flaticon.com/512/3202/3202926.png'},
-    {'name': 'SUV', 'type': 'Spacious', 'price': '₹250', 'eta': '5 min', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097132.png'},
-    {'name': 'Premium', 'type': 'Luxury Sedan', 'price': '₹320', 'eta': '6 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF795548), 'image': 'https://cdn-icons-png.flaticon.com/512/3202/3202003.png'},
-    {'name': 'Luxury', 'type': 'Premium Experience', 'price': '₹500', 'eta': '8 min', 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF000000), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097150.png'},
+    {'name': 'Bike', 'type': 'Quick Rides', 'price': '₹49', 'eta': '2 min', 'capacity': '1', 'icon': Icons.two_wheeler, 'color': Color(0xFF2196F3), 'image': 'assets/images/bike.png'},
+    {'name': 'Auto', 'type': 'Affordable', 'price': '₹76', 'eta': '3 min', 'capacity': '3', 'icon': Icons.electric_rickshaw, 'color': Color(0xFF2196F3), 'image': 'assets/images/auto.jpg'},
+    {'name': 'Cab Economy', 'type': 'Comfortable', 'price': '₹144', 'eta': '4 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'assets/images/economy.png'},
+    {'name': 'SUV', 'type': 'Spacious', 'price': '₹250', 'eta': '5 min', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF2196F3), 'image': 'assets/images/texi.png'},
+    {'name': 'Premium', 'type': 'Luxury Sedan', 'price': '₹320', 'eta': '6 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'assets/images/texi2.png'},
   ];
 
   @override
@@ -70,7 +131,9 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        _dropController.text.isEmpty ? 'Select destination' : _dropController.text,
+                                        _dropController.text.isEmpty 
+                                            ? 'Select destination' 
+                                            : '${_pickupController.text.isEmpty ? "Current Location" : _pickupController.text} → ${_dropController.text}',
                                         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -153,6 +216,193 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                           height: 40,
                           child: const Icon(Icons.location_on, color: Color(0xFFFF5252), size: 40),
                         ),
+                        // Show bike markers when bike is selected
+                        if (_selectedVehicle == 'Bike')
+                          ..._bikeLocations.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final location = entry.value;
+                            // Different rotation angles for each bike
+                            final rotationAngle = (index * 60.0) * (3.14159 / 180); // Convert degrees to radians
+                            
+                            return Marker(
+                              point: location,
+                              width: 50,
+                              height: 50,
+                              child: Transform.rotate(
+                                angle: rotationAngle,
+                                child: Image.asset(
+                                  'assets/images/topview/bike-top.png',
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    print('Error loading bike image: $error');
+                                    return Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFFFF9800),
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                      child: const Icon(
+                                        Icons.two_wheeler,
+                                        color: Colors.white,
+                                        size: 24,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        // Show auto markers when auto is selected
+                        if (_selectedVehicle == 'Auto')
+                          ..._autoLocations.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final location = entry.value;
+                            final rotationAngle = (index * 72.0) * (3.14159 / 180);
+                            
+                            return Marker(
+                              point: location,
+                              width: 50,
+                              height: 50,
+                              child: Transform.rotate(
+                                angle: rotationAngle,
+                                child: Image.asset(
+                                  'assets/images/topview/auto-top.png',
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF2196F3),
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                      child: const Icon(
+                                        Icons.electric_rickshaw,
+                                        color: Colors.white,
+                                        size: 24,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        // Show economy car markers when Cab Economy is selected
+                        if (_selectedVehicle == 'Cab Economy')
+                          ..._economyLocations.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final location = entry.value;
+                            final rotationAngle = (index * 90.0) * (3.14159 / 180);
+                            
+                            return Marker(
+                              point: location,
+                              width: 50,
+                              height: 50,
+                              child: Transform.rotate(
+                                angle: rotationAngle,
+                                child: Image.asset(
+                                  'assets/images/topview/economy-top.png',
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF2196F3),
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                      child: const Icon(
+                                        Icons.directions_car,
+                                        color: Colors.white,
+                                        size: 24,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        // Show SUV markers when SUV is selected
+                        if (_selectedVehicle == 'SUV')
+                          ..._suvLocations.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final location = entry.value;
+                            final rotationAngle = (index * 180.0) * (3.14159 / 180);
+                            
+                            return Marker(
+                              point: location,
+                              width: 50,
+                              height: 50,
+                              child: Transform.rotate(
+                                angle: rotationAngle,
+                                child: Image.asset(
+                                  'assets/images/topview/suv-top.png',
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF2196F3),
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                      child: const Icon(
+                                        Icons.airport_shuttle,
+                                        color: Colors.white,
+                                        size: 24,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        // Show premium car markers when Premium is selected
+                        if (_selectedVehicle == 'Premium')
+                          ..._premiumLocations.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final location = entry.value;
+                            final rotationAngle = (index * 45.0) * (3.14159 / 180);
+                            
+                            return Marker(
+                              point: location,
+                              width: 50,
+                              height: 50,
+                              child: Transform.rotate(
+                                angle: rotationAngle,
+                                child: Image.asset(
+                                  'assets/images/topview/primium-top.png',
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF2196F3),
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                      child: const Icon(
+                                        Icons.directions_car,
+                                        color: Colors.white,
+                                        size: 24,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }).toList(),
                       ],
                     ),
                   ],
@@ -213,44 +463,27 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
             ),
             child: SafeArea(
               top: false,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _selectedVehicle == null ? null : () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF2196F3),
-                        disabledBackgroundColor: Colors.grey[300],
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(
-                        _selectedVehicle == null ? 'Select a vehicle' : 'Book Now',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _selectedVehicle == null ? null : () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF2196F3),
+                    disabledBackgroundColor: Colors.grey[300],
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    _selectedVehicle == null ? 'Select a vehicle' : 'Book Now',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF2196F3), width: 2),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: const Text('Get Bids', style: TextStyle(fontSize: 16, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -309,17 +542,21 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
             Container(
               width: 50,
               height: 50,
-              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: (v['color'] as Color).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Image.network(
-                v['image'],
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(v['icon'], color: v['color'] as Color, size: 24);
-                },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  v['image'],
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(v['icon'], color: v['color'] as Color, size: 24);
+                  },
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -336,7 +573,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(v['price'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: v['color'] as Color)),
+                Text(v['price'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4CAF50))),
                 const SizedBox(height: 2),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
