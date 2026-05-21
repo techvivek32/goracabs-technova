@@ -13,15 +13,17 @@ class TaxiBookingScreen extends StatefulWidget {
 
 class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   String? _selectedVehicle;
-  final _pickupController = TextEditingController(text: 'Current Location');
-  final _dropController = TextEditingController(text: 'Select destination');
+  final _pickupController = TextEditingController();
+  final _dropController = TextEditingController();
   bool _showLocationInputs = true;
 
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Gora Go', 'type': 'Mini', 'price': '₹120', 'eta': '2 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3)},
-    {'name': 'Gora Sedan', 'type': 'Premium', 'price': '₹180', 'eta': '3 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50)},
-    {'name': 'Gora SUV', 'type': 'SUV', 'price': '₹250', 'eta': '5 min', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFFFF9800)},
-    {'name': 'Gora Luxury', 'type': 'Luxury', 'price': '₹400', 'eta': '8 min', 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF9C27B0)},
+    {'name': 'Bike', 'type': 'Quick Rides', 'price': '₹49', 'eta': '2 min', 'capacity': '1', 'icon': Icons.two_wheeler, 'color': Color(0xFFFF9800), 'image': 'https://cdn-icons-png.flaticon.com/512/2972/2972185.png'},
+    {'name': 'Auto', 'type': 'Affordable', 'price': '₹76', 'eta': '3 min', 'capacity': '3', 'icon': Icons.electric_rickshaw, 'color': Color(0xFF4CAF50), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097136.png'},
+    {'name': 'Cab Economy', 'type': 'Comfortable', 'price': '₹144', 'eta': '4 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'https://cdn-icons-png.flaticon.com/512/3202/3202926.png'},
+    {'name': 'SUV', 'type': 'Spacious', 'price': '₹250', 'eta': '5 min', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097132.png'},
+    {'name': 'Premium', 'type': 'Luxury Sedan', 'price': '₹320', 'eta': '6 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF795548), 'image': 'https://cdn-icons-png.flaticon.com/512/3202/3202003.png'},
+    {'name': 'Luxury', 'type': 'Premium Experience', 'price': '₹500', 'eta': '8 min', 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF000000), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097150.png'},
   ];
 
   @override
@@ -89,7 +91,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                       child: Column(
                         children: [
-                          _buildLocationInput(Icons.radio_button_checked, _pickupController, Color(0xFF4CAF50)),
+                          _buildLocationInput(Icons.radio_button_checked, _pickupController, Color(0xFF4CAF50), 'Current Location'),
                           Padding(
                             padding: const EdgeInsets.only(left: 10),
                             child: Row(
@@ -105,13 +107,13 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                               ],
                             ),
                           ),
-                          _buildLocationInput(Icons.location_on, _dropController, Color(0xFFFF5252)),
+                          _buildLocationInput(Icons.location_on, _dropController, Color(0xFFFF5252), 'Select destination'),
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                if (_dropController.text.isNotEmpty && _dropController.text != 'Select destination') {
+                                if (_dropController.text.isNotEmpty) {
                                   setState(() => _showLocationInputs = false);
                                 }
                               },
@@ -257,7 +259,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
     );
   }
 
-  Widget _buildLocationInput(IconData icon, TextEditingController controller, Color iconColor) {
+  Widget _buildLocationInput(IconData icon, TextEditingController controller, Color iconColor, String hint) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -273,6 +275,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
             child: TextField(
               controller: controller,
               decoration: InputDecoration(
+                hintText: hint,
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -304,12 +307,20 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              width: 50,
+              height: 50,
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: (v['color'] as Color).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(v['icon'], color: v['color'] as Color, size: 24),
+              child: Image.network(
+                v['image'],
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(v['icon'], color: v['color'] as Color, size: 24);
+                },
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
