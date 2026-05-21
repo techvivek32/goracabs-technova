@@ -1,42 +1,41 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Modern gradient colors
-  static const Color primaryPurple = Color(0xFF6C5CE7);
-  static const Color secondaryBlue = Color(0xFF74B9FF);
-  static const Color accentOrange = Color(0xFFFF7675);
-  static const Color accentGreen = Color(0xFF00B894);
-  static const Color accentYellow = Color(0xFFFDCB6E);
+  // Clean transparent modern colors
+  static const Color primaryBlue = Color(0xFF2196F3);
+  static const Color lightBlue = Color(0xFF64B5F6);
+  static const Color deepBlue = Color(0xFF1976D2);
+  static const Color accentTeal = Color(0xFF00BCD4);
+  static const Color softPurple = Color(0xFF9C27B0);
   
   // Background colors
-  static const Color backgroundLight = Color(0xFFF8F9FA);
+  static const Color backgroundLight = Color(0xFFFAFAFA);
   static const Color surfaceWhite = Color(0xFFFFFFFF);
   static const Color cardBackground = Color(0xFFFFFFFF);
   
   // Text colors
-  static const Color textDark = Color(0xFF2D3436);
-  static const Color textMedium = Color(0xFF636E72);
-  static const Color textLight = Color(0xFF95A5A6);
+  static const Color textDark = Color(0xFF212121);
+  static const Color textMedium = Color(0xFF757575);
+  static const Color textLight = Color(0xFFBDBDBD);
   
   // Backward compatibility
   static const Color textGrey = textMedium;
-  static const Color primaryBlue = primaryPurple;
   
   // Gradient definitions
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryPurple, secondaryBlue],
+    colors: [primaryBlue, lightBlue],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
   static const LinearGradient accentGradient = LinearGradient(
-    colors: [accentOrange, accentYellow],
+    colors: [accentTeal, Color(0xFF4DD0E1)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
   static const LinearGradient successGradient = LinearGradient(
-    colors: [accentGreen, Color(0xFF55EFC4)],
+    colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -45,14 +44,14 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryPurple,
-        primary: primaryPurple,
+        seedColor: primaryBlue,
+        primary: primaryBlue,
         onPrimary: Colors.white,
         surface: surfaceWhite,
         onSurface: textDark,
         background: backgroundLight,
         onBackground: textDark,
-        secondary: secondaryBlue,
+        secondary: accentTeal,
         onSecondary: Colors.white,
       ),
       scaffoldBackgroundColor: backgroundLight,
@@ -70,14 +69,14 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryPurple,
+          backgroundColor: primaryBlue,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 4,
-          shadowColor: primaryPurple.withOpacity(0.3),
+          shadowColor: primaryBlue.withOpacity(0.3),
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -106,11 +105,11 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: primaryPurple, width: 2),
+          borderSide: const BorderSide(color: primaryBlue, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: accentOrange, width: 1),
+          borderSide: const BorderSide(color: Color(0xFFD32F2F), width: 1),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         hintStyle: TextStyle(color: textLight, fontSize: 15),
@@ -161,13 +160,13 @@ class AppTheme {
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surfaceWhite,
-        selectedItemColor: primaryPurple,
+        selectedItemColor: primaryBlue,
         unselectedItemColor: textLight,
         elevation: 20,
         type: BottomNavigationBarType.fixed,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: primaryPurple,
+        backgroundColor: primaryBlue,
         foregroundColor: Colors.white,
         elevation: 8,
         shape: RoundedRectangleBorder(
@@ -187,7 +186,7 @@ class AppTheme {
       borderRadius: BorderRadius.circular(borderRadius),
       boxShadow: boxShadow ?? [
         BoxShadow(
-          color: primaryPurple.withOpacity(0.3),
+          color: primaryBlue.withOpacity(0.3),
           blurRadius: 12,
           offset: const Offset(0, 6),
         ),
@@ -204,7 +203,7 @@ class AppTheme {
       borderRadius: BorderRadius.circular(borderRadius),
       boxShadow: boxShadow ?? [
         BoxShadow(
-          color: accentOrange.withOpacity(0.3),
+          color: accentTeal.withOpacity(0.3),
           blurRadius: 12,
           offset: const Offset(0, 6),
         ),

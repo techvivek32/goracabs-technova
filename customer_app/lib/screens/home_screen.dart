@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
 import 'taxi_booking_screen.dart';
 import 'outstation_screen.dart';
@@ -23,151 +21,205 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _hasOngoingRide = true;
-  final MapController _mapController = MapController();
+  int _currentIndex = 0;
 
   final List<Map<String, dynamic>> _services = [
-    {'icon': Icons.local_taxi, 'label': 'Taxi', 'color': Color(0xFF2196F3)},
-    {'icon': Icons.route, 'label': 'Outstation', 'color': Color(0xFF4CAF50)},
-    {'icon': Icons.schedule, 'label': 'Rental', 'color': Color(0xFFFF9800)},
-    {'icon': Icons.person_pin, 'label': 'Hire Driver', 'color': Color(0xFF9C27B0)},
+    {'icon': Icons.local_taxi, 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': Icons.route, 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
+    {'icon': Icons.schedule, 'label': 'Rental', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
+    {'icon': Icons.person_pin, 'label': 'Hire Driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
   ];
 
-  final List<Map<String, String>> _recentPlaces = [
-    {'name': 'Home', 'address': '12, MG Road, Delhi', 'icon': 'home'},
-    {'name': 'Office', 'address': 'Cyber City, Gurugram', 'icon': 'work'},
-    {'name': 'Phoenix Mall', 'address': 'Nagar Road, Pune', 'icon': 'place'},
+  final List<Map<String, String>> _recentLocations = [
+    {'name': 'Home', 'address': '12, MG Road, Delhi'},
+    {'name': 'Office', 'address': 'Cyber City, Gurugram'},
+  ];
+
+  final List<Map<String, String>> _popularLocations = [
+    {'name': 'Phoenix Mall', 'address': 'Nagar Road, Pune', 'image': 'https://images.unsplash.com/photo-1519567241046-7f570eee3ce6?w=400'},
+    {'name': 'Airport Terminal 3', 'address': 'IGI Airport, Delhi', 'image': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400'},
+    {'name': 'Railway Station', 'address': 'New Delhi Railway Station', 'image': 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=400'},
   ];
 
   final List<Map<String, String>> _promos = [
-    {'title': '50% OFF your first ride!', 'sub': 'Use code: GORA50', 'color': '0xFF2196F3'},
-    {'title': 'Free Delivery today', 'sub': 'On orders above ₹200', 'color': '0xFF4CAF50'},
-    {'title': 'Refer & Earn ₹100', 'sub': 'Invite friends to Gora Cabs', 'color': '0xFFFF9800'},
+    {'title': '50% OFF your first ride!', 'sub': 'Use code: GORA50', 'color': '0xFF0052CC'},
+    {'title': 'Free Delivery today', 'sub': 'On orders above ₹200', 'color': '0xFFE65100'},
+    {'title': 'Refer & Earn ₹100', 'sub': 'Invite friends to Gora Cabs', 'color': '0xFF2E7D32'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: _buildDrawer(),
-      body: Stack(
-        children: [
-          // OpenStreetMap using flutter_map
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: LatLng(28.6139, 77.2090),
-              initialZoom: 14.0,
-              minZoom: 5.0,
-              maxZoom: 18.0,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.goracabs.customer_app',
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: LatLng(28.6139, 77.2090),
-                    width: 40,
-                    height: 40,
-                    child: Icon(
-                      Icons.location_on,
-                      color: Color(0xFF2196F3),
-                      size: 40,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+      body: _getSelectedPage(),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
 
-          // Top bar
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  Widget _getSelectedPage() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildHomePage();
+      case 1:
+        return const ServiceSelectionScreen();
+      case 2:
+        return const RideHistoryScreen();
+      case 3:
+        return _buildProfilePage();
+      default:
+        return _buildHomePage();
+    }
+  }
+
+  Widget _buildBottomNavBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(20),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          )
+        ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: AppTheme.primaryBlue,
+        unselectedItemColor: Colors.grey,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
+        elevation: 0,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.grid_view_outlined),
+            activeIcon: Icon(Icons.grid_view),
+            label: 'Services',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            activeIcon: Icon(Icons.history),
+            label: 'Recent Rides',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHomePage() {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Builder(
-                    builder: (ctx) => _circleButton(Icons.menu, () => Scaffold.of(ctx).openDrawer()),
+                  const CircleAvatar(
+                    radius: 22,
+                    backgroundColor: AppTheme.primaryBlue,
+                    child: Icon(Icons.person, color: Colors.white, size: 24),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Where are you going?',
-                        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
-                        prefixIcon: const Icon(Icons.search, color: Color(0xFF2196F3), size: 20),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      ),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Hello,', style: TextStyle(fontSize: 13, color: AppTheme.textGrey)),
+                        SizedBox(height: 2),
+                        Text('John Doe', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  _circleButton(Icons.my_location, () {}),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.notifications_outlined, size: 26),
+                  ),
                 ],
               ),
             ),
-          ),
-
-          // Bottom sheet
-          DraggableScrollableSheet(
-            initialChildSize: 0.42,
-            minChildSize: 0.15,
-            maxChildSize: 0.88,
-            builder: (context, scrollController) {
-              return Container(
-                decoration: const BoxDecoration(
+            
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12, 
-                      blurRadius: 10, 
-                      spreadRadius: 1,
-                      offset: Offset(0, -2),
+                      color: Colors.black.withAlpha(20),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     )
                   ],
                 ),
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Where are you going?',
+                    hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
+                    prefixIcon: const Icon(Icons.search, color: AppTheme.primaryBlue, size: 22),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Drag handle
-                    Center(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 12),
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                    ..._recentLocations.map((loc) => _buildRecentItem(loc)),
+                    
+                    const SizedBox(height: 24),
+                    
+                    const Text('Popular Places', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 140,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _popularLocations.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (_, i) => _buildPopularCard(_popularLocations[i]),
                       ),
                     ),
-
-                    // Ongoing ride
-                    if (_hasOngoingRide) ...[
+                    
+                    const SizedBox(height: 24),
+                    
+                    if (_hasOngoingRide) ...[ 
                       _buildOngoingRide(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                     ],
 
-                    // Services grid
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Our Services',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const Text('Our Services', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceSelectionScreen()));
-                          },
-                          child: Text('View All',
-                              style: TextStyle(fontSize: 14, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
+                          onTap: () => setState(() => _currentIndex = 1),
+                          child: const Text('View All', style: TextStyle(fontSize: 14, color: AppTheme.primaryBlue, fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
@@ -179,9 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Promo banners
-                    const Text('Offers for you',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Offers for you', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     SizedBox(
                       height: 100,
@@ -192,42 +242,128 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (_, i) => _buildPromoBanner(_promos[i]),
                       ),
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // Recent places
-                    const Text('Recent Places',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    ..._recentPlaces.map((p) => _buildRecentPlace(p)),
+                    const SizedBox(height: 20),
                   ],
                 ),
-              );
-            },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentItem(Map<String, String> location) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(Icons.access_time, color: Colors.grey[600], size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  location['name']!,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  location['address']!,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.favorite_border, color: Colors.grey[600], size: 20),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
           ),
         ],
       ),
     );
   }
 
-  Widget _circleButton(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(30),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            )
+  Widget _buildPopularCard(Map<String, String> location) {
+    return Container(
+      width: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            Image.network(
+              location['image']!,
+              width: 200,
+              height: 140,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 200,
+                  height: 140,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                );
+              },
+            ),
+            Container(
+              width: 200,
+              height: 140,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.7),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 12,
+              left: 12,
+              right: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    location['name']!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    location['address']!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
-        child: Icon(icon, color: Color(0xFF2196F3), size: 22),
       ),
     );
   }
@@ -248,21 +384,16 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 68,
+            height: 68,
             decoration: BoxDecoration(
-              color: (s['color'] as Color).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: (s['color'] as Color).withOpacity(0.3),
-                width: 1,
-              ),
+              color: s['bgColor'] as Color,
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 28),
+            child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 32),
           ),
           const SizedBox(height: 8),
-          Text(s['label'] as String,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
+          Text(s['label'] as String, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -272,14 +403,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF2196F3),
-        borderRadius: BorderRadius.circular(12),
+        color: AppTheme.primaryBlue.withAlpha(25),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.primaryBlue.withAlpha(80), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF2196F3).withOpacity(0.2),
-            blurRadius: 8,
+            color: AppTheme.primaryBlue.withAlpha(30),
+            blurRadius: 12,
             offset: const Offset(0, 4),
-          ),
+          )
         ],
       ),
       child: Row(
@@ -287,29 +419,27 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white24,
-              borderRadius: BorderRadius.circular(16),
+              color: AppTheme.primaryBlue,
+              borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(Icons.directions_car, color: Colors.white, size: 24),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Ongoing Ride',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white)),
+                Text('Ongoing Ride', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 SizedBox(height: 4),
-                Text('Driver is 2 min away • Gora Go',
-                    style: TextStyle(fontSize: 13, color: Colors.white70)),
+                Text('Driver is 2 min away • Gora Go', style: TextStyle(fontSize: 12, color: AppTheme.textGrey)),
               ],
             ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {},
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: AppTheme.primaryPurple,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryBlue,
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -323,143 +453,133 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPromoBanner(Map<String, String> promo) {
     final color = Color(int.parse(promo['color']!));
     return Container(
-      width: 220,
-      padding: const EdgeInsets.all(16),
+      width: 240,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [color, color.withAlpha(180)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 8,
+            color: color.withAlpha(80),
+            blurRadius: 12,
             offset: const Offset(0, 4),
-          ),
+          )
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(promo['title']!,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-          const SizedBox(height: 4),
-          Text(promo['sub']!,
-              style: const TextStyle(color: Colors.white70, fontSize: 12)),
+          Text(promo['title']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+          const SizedBox(height: 6),
+          Text(promo['sub']!, style: TextStyle(color: Colors.white.withAlpha(220), fontSize: 13)),
         ],
       ),
     );
   }
 
-  Widget _buildRecentPlace(Map<String, String> place) {
-    final iconMap = {
-      'home': Icons.home_outlined,
-      'work': Icons.work_outline,
-      'place': Icons.place_outlined
-    };
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(iconMap[place['icon']] ?? Icons.place_outlined,
-            color: Color(0xFF2196F3), size: 20),
-      ),
-      title: Text(place['name']!,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.black87)),
-      subtitle: Text(place['address']!,
-          style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-      trailing: Icon(Icons.north_west, size: 16, color: Colors.grey[500]),
-      onTap: () {},
-    );
-  }
-
-  Widget _buildDrawer() {
-    return Drawer(
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 24),
-            color: Color(0xFF2196F3),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
-                  },
-                  child: const Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 36,
-                        backgroundColor: Colors.white24,
-                        child: Icon(Icons.person, size: 40, color: Colors.white),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('John Doe',
-                                style: TextStyle(
-                                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
-                            SizedBox(height: 4),
-                            Text('john.doe@goracabs.com',
-                                style: TextStyle(color: Colors.white70, fontSize: 14)),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
-                    ],
+  Widget _buildProfilePage() {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppTheme.primaryBlue, AppTheme.primaryBlue],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                 ),
-              ],
-            ),
+                child: Column(
+                  children: [
+                    const CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.person, size: 50, color: AppTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('John Doe', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
+                    const SizedBox(height: 4),
+                    const Text('john.doe@goracabs.com', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+                      },
+                      icon: const Icon(Icons.edit, size: 18),
+                      label: const Text('Edit Profile'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppTheme.primaryBlue,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildProfileMenuItem(Icons.account_balance_wallet_outlined, 'Wallet', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen()));
+              }),
+              _buildProfileMenuItem(Icons.history, 'Ride History', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const RideHistoryScreen()));
+              }),
+              _buildProfileMenuItem(Icons.card_giftcard_outlined, 'Offers & Promos', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const OffersScreen()));
+              }),
+              _buildProfileMenuItem(Icons.help_outline, 'Help & Support', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
+              }),
+              _buildProfileMenuItem(Icons.settings_outlined, 'Settings', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+              }),
+              _buildProfileMenuItem(Icons.logout, 'Logout', () {}, color: Colors.red),
+              const SizedBox(height: 20),
+            ],
           ),
-          const SizedBox(height: 8),
-          _drawerItem(Icons.person_outline, 'My Profile', onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
-          }),
-          _drawerItem(Icons.account_balance_wallet_outlined, 'Wallet', onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen()));
-          }),
-          _drawerItem(Icons.history, 'Ride History', onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const RideHistoryScreen()));
-          }),
-          _drawerItem(Icons.card_giftcard_outlined, 'Offers & Promos', onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const OffersScreen()));
-          }),
-          _drawerItem(Icons.help_outline, 'Help & Support', onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
-          }),
-          const Spacer(),
-          const Divider(),
-          _drawerItem(Icons.settings_outlined, 'Settings', onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
-          }),
-          _drawerItem(Icons.logout, 'Logout', color: Colors.red),
-          const SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _drawerItem(IconData icon, String title, {Color? color, VoidCallback? onTap}) {
-    return ListTile(
-      leading: Icon(icon, color: color ?? Colors.grey[600], size: 22),
-      title: Text(title, style: TextStyle(fontSize: 15, color: color ?? Colors.black87, fontWeight: FontWeight.w500)),
-      onTap: onTap ?? () => Navigator.pop(context),
+  Widget _buildProfileMenuItem(IconData icon, String title, VoidCallback onTap, {Color? color}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          )
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: (color ?? AppTheme.primaryBlue).withAlpha(20),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color ?? AppTheme.primaryBlue, size: 22),
+        ),
+        title: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: color ?? Colors.black87)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+        onTap: onTap,
+      ),
     );
   }
 }

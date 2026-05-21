@@ -27,6 +27,7 @@ class _BookingScreenState extends State<BookingScreen> {
         title: const Text('Book a Ride'),
         backgroundColor: AppTheme.primaryBlue,
         foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
@@ -44,7 +45,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     children: [
                       const Text('Estimated Fare:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const Spacer(),
-                      Text('₹120 - ₹400', style: TextStyle(fontSize: 18, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
+                      Text('₹120 - ₹400', style: TextStyle(fontSize: 18, color: AppTheme.primaryBlue, fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -67,7 +68,13 @@ class _BookingScreenState extends State<BookingScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, -2),
+                ),
+              ],
             ),
             child: Column(
               children: [
@@ -80,8 +87,10 @@ class _BookingScreenState extends State<BookingScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          elevation: 2,
                         ),
                         child: const Text('Book Now', style: TextStyle(fontSize: 16, color: Colors.white)),
                       ),
@@ -93,9 +102,10 @@ class _BookingScreenState extends State<BookingScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
                         },
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppTheme.primaryBlue),
+                          side: const BorderSide(color: AppTheme.primaryBlue, width: 1.5),
+                          foregroundColor: AppTheme.primaryBlue,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         child: const Text('Get Bids', style: TextStyle(fontSize: 16, color: AppTheme.primaryBlue)),
                       ),
@@ -114,9 +124,16 @@ class _BookingScreenState extends State<BookingScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -145,17 +162,27 @@ class _BookingScreenState extends State<BookingScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue.withAlpha(20) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!, width: isSelected ? 2 : 1),
+          color: isSelected ? AppTheme.primaryBlue.withOpacity(0.08) : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!, 
+            width: isSelected ? 2 : 1
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primaryBlue : Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
+                color: isSelected ? AppTheme.primaryBlue : Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(v['icon'], color: isSelected ? Colors.white : AppTheme.textGrey, size: 28),
             ),
@@ -201,12 +228,13 @@ class DriverBiddingScreen extends StatelessWidget {
         title: const Text('Driver Bids'),
         backgroundColor: AppTheme.primaryBlue,
         foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            color: AppTheme.primaryBlue.withAlpha(20),
+            color: AppTheme.primaryBlue.withOpacity(0.08),
             child: Row(
               children: [
                 const Icon(Icons.info_outline, color: AppTheme.primaryBlue),
@@ -228,8 +256,15 @@ class DriverBiddingScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.grey[300]!),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
@@ -237,7 +272,7 @@ class DriverBiddingScreen extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 28,
-                            backgroundColor: AppTheme.primaryBlue.withAlpha(30),
+                            backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
                             child: const Icon(Icons.person, color: AppTheme.primaryBlue, size: 28),
                           ),
                           const SizedBox(width: 12),
@@ -275,8 +310,10 @@ class DriverBiddingScreen extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 44),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          elevation: 2,
                         ),
                         child: const Text('Accept Bid', style: TextStyle(color: Colors.white)),
                       ),
@@ -351,7 +388,7 @@ class TripTrackingScreen extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 32,
-                            backgroundColor: AppTheme.primaryBlue.withAlpha(30),
+                            backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
                             child: const Icon(Icons.person, color: AppTheme.primaryBlue, size: 32),
                           ),
                           const SizedBox(width: 14),
@@ -513,6 +550,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         backgroundColor: AppTheme.primaryBlue,
         foregroundColor: Colors.white,
+        elevation: 2,
       ),
       body: Column(
         children: [
@@ -549,7 +587,13 @@ class _ChatScreenState extends State<ChatScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 4, offset: const Offset(0, -1))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, -1),
+                ),
+              ],
             ),
             child: Row(
               children: [
