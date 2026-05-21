@@ -22,12 +22,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _hasOngoingRide = true;
   int _currentIndex = 0;
+  bool _showRecentLocations = false;
+  final FocusNode _searchFocusNode = FocusNode();
 
   final List<Map<String, dynamic>> _services = [
-    {'icon': Icons.local_taxi, 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
-    {'icon': Icons.route, 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
-    {'icon': Icons.schedule, 'label': 'Rental', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
-    {'icon': Icons.person_pin, 'label': 'Hire Driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
+    {'icon': 'assets/images/texi.png', 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/outstation.png', 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
+    {'icon': 'assets/images/rental.png', 'label': 'Rental', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
+    {'icon': 'assets/images/hiredriver.png', 'label': 'Hire Driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
   ];
 
   final List<Map<String, String>> _recentLocations = [
@@ -46,6 +48,22 @@ class _HomeScreenState extends State<HomeScreen> {
     {'title': 'Free Delivery today', 'sub': 'On orders above ₹200', 'color': '0xFFE65100'},
     {'title': 'Refer & Earn ₹100', 'sub': 'Invite friends to Gora Cabs', 'color': '0xFF2E7D32'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchFocusNode.addListener(() {
+      setState(() {
+        _showRecentLocations = _searchFocusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHomePage() {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Color(0xFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -166,6 +184,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 child: TextField(
+                  focusNode: _searchFocusNode,
+                  onTap: () {
+                    setState(() {
+                      _showRecentLocations = true;
+                    });
+                  },
                   decoration: InputDecoration(
                     hintText: 'Where are you going?',
                     hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
@@ -190,9 +214,39 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ..._recentLocations.map((loc) => _buildRecentItem(loc)),
-                    
-                    const SizedBox(height: 24),
+                    if (_showRecentLocations) ...[
+                      Container(
+                        color: Color(0xFFF8F8F8),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        child: Column(
+                          children: _recentLocations.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final loc = entry.value;
+                            return Column(
+                              children: [
+                                _buildRecentItem(loc),
+                                if (index < _recentLocations.length - 1)
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 8),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(width: 32),
+                                        Expanded(
+                                          child: CustomPaint(
+                                            size: const Size(double.infinity, 1),
+                                            painter: DottedLinePainter(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
                     
                     const Text('Popular Places', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
@@ -254,8 +308,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecentItem(Map<String, String> location) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(Icons.access_time, color: Colors.grey[600], size: 20),
@@ -390,10 +444,20 @@ class _HomeScreenState extends State<HomeScreen> {
               color: s['bgColor'] as Color,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 32),
+            child: s['icon'] is String
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      s['icon'] as String,
+                      width: 68,
+                      height: 68,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Icon(s['icon'] as IconData, color: s['color'] as Color, size: 32),
           ),
           const SizedBox(height: 8),
-          Text(s['label'] as String, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+          Text(s['label'] as String, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
         ],
       ),
     );
@@ -403,26 +467,39 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.primaryBlue.withAlpha(25),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.primaryBlue.withAlpha(80), width: 1.5),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryBlue.withAlpha(30),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
-          )
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: AppTheme.primaryBlue,
+              color: AppTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.directions_car, color: Colors.white, size: 24),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.asset(
+                'assets/images/texi2.png',
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           const SizedBox(width: 14),
           const Expanded(
@@ -456,27 +533,60 @@ class _HomeScreenState extends State<HomeScreen> {
       width: 240,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color, color.withAlpha(180)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: color.withAlpha(80),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
-          )
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          Text(promo['title']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-          const SizedBox(height: 6),
-          Text(promo['sub']!, style: TextStyle(color: Colors.white.withAlpha(220), fontSize: 13)),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.local_offer,
+              color: AppTheme.primaryBlue,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  promo['title']!,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  promo['sub']!,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -582,4 +692,30 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+class DottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey[300]!
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 4.0;
+    const dashSpace = 4.0;
+    double startX = 0;
+
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, 0),
+        Offset(startX + dashWidth, 0),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
