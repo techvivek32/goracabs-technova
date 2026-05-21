@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
 import 'booking_screen.dart';
 
@@ -11,8 +13,9 @@ class TaxiBookingScreen extends StatefulWidget {
 
 class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   String? _selectedVehicle;
-  final _pickupController = TextEditingController();
-  final _dropController = TextEditingController();
+  final _pickupController = TextEditingController(text: 'Current Location');
+  final _dropController = TextEditingController(text: 'Select destination');
+  bool _showLocationInputs = true;
 
   final List<Map<String, dynamic>> _vehicles = [
     {'name': 'Gora Go', 'type': 'Mini', 'price': '₹120', 'eta': '2 min', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3)},
@@ -24,56 +27,180 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Book a Taxi'),
-        backgroundColor: Color(0xFF2196F3),
-        foregroundColor: Colors.white,
-        elevation: 2,
-      ),
       body: Column(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+          Container(
+            color: Colors.white,
+            child: SafeArea(
+              bottom: false,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLocationInput(Icons.radio_button_checked, 'Pickup Location', _pickupController),
-                  const SizedBox(height: 16),
-                  _buildLocationInput(Icons.location_on, 'Drop Location', _dropController),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      const Text('Estimated Fare:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF2196F3),
-                          borderRadius: BorderRadius.circular(8),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.arrow_back, size: 20),
+                          ),
                         ),
-                        child: Text('₹120 - ₹400', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                        const SizedBox(width: 12),
+                        if (_showLocationInputs)
+                          const Text('Book a Taxi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                        else
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => setState(() => _showLocationInputs = true),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey[300]!),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        _dropController.text.isEmpty ? 'Select destination' : _dropController.text,
+                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(Icons.edit, size: 16, color: Colors.grey[600]),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (_showLocationInputs)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: Column(
+                        children: [
+                          _buildLocationInput(Icons.radio_button_checked, _pickupController, Color(0xFF4CAF50)),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Row(
+                              children: [
+                                Column(
+                                  children: List.generate(2, (index) => Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 1),
+                                    width: 2,
+                                    height: 3,
+                                    color: Colors.grey[400],
+                                  )),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _buildLocationInput(Icons.location_on, _dropController, Color(0xFFFF5252)),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_dropController.text.isNotEmpty && _dropController.text != 'Select destination') {
+                                  setState(() => _showLocationInputs = false);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF2196F3),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: const Text('Confirm Location', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.route, color: Colors.grey[600], size: 16),
-                      const SizedBox(width: 8),
-                      Text('Distance: 8.5 km', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-                      const Spacer(),
-                      Icon(Icons.access_time, color: Colors.grey[600], size: 16),
-                      const SizedBox(width: 8),
-                      Text('ETA: 15-20 min', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  const Text('Select Vehicle', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 12),
-                  ..._vehicles.map((v) => _buildVehicleCard(v)),
+                    ),
                 ],
               ),
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(28.6139, 77.2090),
+                    initialZoom: 13.0,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.goracabs.customer',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: LatLng(28.6139, 77.2090),
+                          width: 40,
+                          height: 40,
+                          child: const Icon(Icons.location_on, color: Color(0xFFFF5252), size: 40),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                DraggableScrollableSheet(
+                  initialChildSize: 0.4,
+                  minChildSize: 0.4,
+                  maxChildSize: 0.85,
+                  builder: (context, scrollController) {
+                    return Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 10,
+                            offset: Offset(0, -2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 12),
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView(
+                              controller: scrollController,
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                              children: [
+                                const Text('Select Vehicle', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 16),
+                                ..._vehicles.map((v) => _buildVehicleCard(v)),
+                                const SizedBox(height: 80),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
           Container(
@@ -82,40 +209,47 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
               color: Colors.white,
               boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
             ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _selectedVehicle == null ? null : () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF2196F3),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: SafeArea(
+              top: false,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _selectedVehicle == null ? null : () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF2196F3),
+                        disabledBackgroundColor: Colors.grey[300],
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        _selectedVehicle == null ? 'Select a vehicle' : 'Book Now',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
+                          fontWeight: FontWeight.w600,
                         ),
-                        child: const Text('Book Now', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFF2196F3), width: 2),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: const Text('Get Bids', style: TextStyle(fontSize: 16, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF2196F3), width: 2),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
+                      child: const Text('Get Bids', style: TextStyle(fontSize: 16, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -123,33 +257,28 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
     );
   }
 
-  Widget _buildLocationInput(IconData icon, String hint, TextEditingController controller) {
+  Widget _buildLocationInput(IconData icon, TextEditingController controller, Color iconColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[200]!),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Color(0xFF2196F3), size: 20),
-          const SizedBox(width: 12),
+          Icon(icon, color: iconColor, size: 18),
+          const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: controller,
               decoration: InputDecoration(
-                hintText: hint,
                 border: InputBorder.none,
-                hintStyle: TextStyle(color: Colors.grey[500]),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
               ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, height: 1.4),
             ),
           ),
         ],
@@ -163,52 +292,40 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
       onTap: () => setState(() => _selectedVehicle = v['name']),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? (v['color'] as Color).withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Color(0xFF2196F3) : Colors.grey[300]!, 
+            color: isSelected ? (v['color'] as Color) : Colors.grey[300]!, 
             width: isSelected ? 2 : 1
           ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected 
-                ? Color(0xFF2196F3).withOpacity(0.2)
-                : Colors.black.withOpacity(0.05),
-              blurRadius: isSelected ? 8 : 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: (v['color'] as Color).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: (v['color'] as Color).withOpacity(0.3),
-                ),
               ),
-              child: Icon(v['icon'], color: v['color'] as Color, size: 28),
+              child: Icon(v['icon'], color: v['color'] as Color, size: 24),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(v['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(v['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 2),
-                  Text('${v['type']} • ${v['capacity']} seats', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                  Text('${v['type']} • ${v['capacity']} seats', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(v['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
+                Text(v['price'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: v['color'] as Color)),
                 const SizedBox(height: 2),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -216,7 +333,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                     color: Color(0xFF4CAF50).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text(v['eta'], style: const TextStyle(fontSize: 11, color: Color(0xFF4CAF50), fontWeight: FontWeight.w600)),
+                  child: Text(v['eta'], style: const TextStyle(fontSize: 10, color: Color(0xFF4CAF50), fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
