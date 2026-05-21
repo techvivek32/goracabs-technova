@@ -180,18 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 child: TextField(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TaxiBookingScreen(
-                          fromLocation: 'Current Location',
-                          hideLocationInputs: true,
-                        ),
-                      ),
-                    );
-                  },
-                  readOnly: true,
+                  onTap: null, // Remove the onTap to allow typing
+                  readOnly: false, // Allow editing
                   decoration: InputDecoration(
                     hintText: 'Where are you going?',
                     hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
@@ -326,8 +316,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.grey[50]!,
                             Colors.grey[100]!,
+                            Colors.grey[200]!,
                           ],
                         ),
                       ),
@@ -345,40 +335,40 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 'Gora Cabs',
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 26,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.grey[400],
-                                  letterSpacing: 1.2,
+                                  color: Colors.grey[600],
+                                  letterSpacing: 1.5,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.favorite, color: Colors.red[400], size: 16),
-                                  const SizedBox(width: 6),
+                                  Icon(Icons.favorite, color: Colors.red[500], size: 18),
+                                  const SizedBox(width: 8),
                                   Text(
                                     'Made in India',
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 6),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.location_on, color: Colors.orange[400], size: 16),
-                                  const SizedBox(width: 6),
+                                  Icon(Icons.location_on, color: Colors.orange[500], size: 18),
+                                  const SizedBox(width: 8),
                                   Text(
                                     'Crafted in Rajasthan',
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
@@ -833,12 +823,12 @@ class RajasthaniPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.orange.withOpacity(0.08)
-      ..strokeWidth = 1.5
+      ..color = Colors.orange.withOpacity(0.15)
+      ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
     final fillPaint = Paint()
-      ..color = Colors.orange.withOpacity(0.03)
+      ..color = Colors.orange.withOpacity(0.08)
       ..style = PaintingStyle.fill;
 
     // Draw palace-inspired arches and geometric patterns
@@ -850,8 +840,8 @@ class RajasthaniPatternPainter extends CustomPainter {
       final x = (size.width / 4) * (i + 0.5);
       final archRect = Rect.fromCenter(
         center: Offset(x, centerY - 10),
-        width: 40,
-        height: 25,
+        width: 45,
+        height: 30,
       );
       
       // Draw arch
@@ -859,60 +849,60 @@ class RajasthaniPatternPainter extends CustomPainter {
       canvas.drawArc(archRect, 0, 3.14159, false, fillPaint);
       
       // Draw small decorative circles (like palace domes)
-      canvas.drawCircle(Offset(x, centerY - 22), 3, paint);
-      canvas.drawCircle(Offset(x, centerY - 22), 3, fillPaint);
+      canvas.drawCircle(Offset(x, centerY - 25), 4, paint);
+      canvas.drawCircle(Offset(x, centerY - 25), 4, fillPaint);
     }
 
     // Draw geometric border patterns
     final borderPaint = Paint()
-      ..color = Colors.orange.withOpacity(0.06)
-      ..strokeWidth = 1
+      ..color = Colors.orange.withOpacity(0.12)
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
     // Top border pattern
-    for (double x = 0; x < size.width; x += 20) {
+    for (double x = 0; x < size.width; x += 25) {
       canvas.drawLine(
-        Offset(x, 5),
-        Offset(x + 10, 15),
+        Offset(x, 8),
+        Offset(x + 12, 20),
         borderPaint,
       );
       canvas.drawLine(
-        Offset(x + 10, 15),
-        Offset(x + 20, 5),
+        Offset(x + 12, 20),
+        Offset(x + 25, 8),
         borderPaint,
       );
     }
 
     // Bottom border pattern
-    for (double x = 0; x < size.width; x += 20) {
+    for (double x = 0; x < size.width; x += 25) {
       canvas.drawLine(
-        Offset(x, size.height - 5),
-        Offset(x + 10, size.height - 15),
+        Offset(x, size.height - 8),
+        Offset(x + 12, size.height - 20),
         borderPaint,
       );
       canvas.drawLine(
-        Offset(x + 10, size.height - 15),
-        Offset(x + 20, size.height - 5),
+        Offset(x + 12, size.height - 20),
+        Offset(x + 25, size.height - 8),
         borderPaint,
       );
     }
 
     // Side decorative elements
     final sidePaint = Paint()
-      ..color = Colors.orange.withOpacity(0.05)
-      ..strokeWidth = 1
+      ..color = Colors.orange.withOpacity(0.1)
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
     // Left side pattern
-    for (double y = 20; y < size.height - 20; y += 15) {
-      canvas.drawCircle(Offset(10, y), 2, sidePaint);
-      canvas.drawLine(Offset(5, y), Offset(15, y), sidePaint);
+    for (double y = 25; y < size.height - 25; y += 18) {
+      canvas.drawCircle(Offset(12, y), 3, sidePaint);
+      canvas.drawLine(Offset(6, y), Offset(18, y), sidePaint);
     }
 
     // Right side pattern
-    for (double y = 20; y < size.height - 20; y += 15) {
-      canvas.drawCircle(Offset(size.width - 10, y), 2, sidePaint);
-      canvas.drawLine(Offset(size.width - 15, y), Offset(size.width - 5, y), sidePaint);
+    for (double y = 25; y < size.height - 25; y += 18) {
+      canvas.drawCircle(Offset(size.width - 12, y), 3, sidePaint);
+      canvas.drawLine(Offset(size.width - 18, y), Offset(size.width - 6, y), sidePaint);
     }
   }
 
