@@ -19,10 +19,11 @@ class _OutstationScreenState extends State<OutstationScreen> {
   final _departureTimeController = TextEditingController();
   final _returnDateController = TextEditingController();
   final _returnTimeController = TextEditingController();
-  bool _showLocationInputs = true;
+  bool _showLocationInputs = false;
   String _tripType = 'One Way';
-  bool _showTripDetails = true;
+  bool _showTripDetails = false;
   bool _showVehicleSelection = false;
+  bool _locationConfirmed = false;
 
   final List<Map<String, dynamic>> _vehicles = [
     {'name': 'Sedan', 'type': 'Comfortable', 'price': '₹12/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'https://cdn-icons-png.flaticon.com/512/3202/3202926.png'},
@@ -33,35 +34,41 @@ class _OutstationScreenState extends State<OutstationScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Set empty controllers for placeholders
+    _fromController.text = '';
+    _toController.text = '';
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: Colors.white,
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(10),
+          if (!_locationConfirmed)
+            Container(
+              color: Colors.white,
+              child: SafeArea(
+                bottom: false,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.arrow_back, size: 20),
                             ),
-                            child: const Icon(Icons.arrow_back, size: 20),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        if (_showLocationInputs)
-                          const Text('Outstation Booking', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                        else
+                          const SizedBox(width: 12),
                           Expanded(
                             child: GestureDetector(
                               onTap: () => setState(() => _showLocationInputs = true),
@@ -76,8 +83,14 @@ class _OutstationScreenState extends State<OutstationScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        _toController.text.isEmpty ? 'Select destination' : '${_fromController.text} → ${_toController.text}',
-                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                        _fromController.text.isEmpty && _toController.text.isEmpty
+                                            ? 'Current Location → Select Destination'
+                                            : '${_fromController.text.isEmpty ? "Current Location" : _fromController.text} → ${_toController.text.isEmpty ? "Select Destination" : _toController.text}',
+                                        style: TextStyle(
+                                          fontSize: 14, 
+                                          fontWeight: FontWeight.w500,
+                                          color: _fromController.text.isEmpty && _toController.text.isEmpty ? Colors.grey[600] : Colors.black87,
+                                        ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -89,55 +102,59 @@ class _OutstationScreenState extends State<OutstationScreen> {
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                  if (_showLocationInputs)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Column(
-                        children: [
-                          _buildLocationInput(Icons.radio_button_checked, _fromController, Color(0xFF4CAF50), 'From (Pickup Location)'),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Row(
-                              children: [
-                                Column(
-                                  children: List.generate(2, (index) => Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 1),
-                                    width: 2,
-                                    height: 3,
-                                    color: Colors.grey[400],
-                                  )),
-                                ),
-                              ],
-                            ),
-                          ),
-                          _buildLocationInput(Icons.location_on, _toController, Color(0xFFFF5252), 'To (Destination)'),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (_toController.text.isNotEmpty && _fromController.text.isNotEmpty) {
-                                  setState(() => _showLocationInputs = false);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF2196F3),
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              child: const Text('Search Cabs', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600)),
-                            ),
-                          ),
                         ],
                       ),
                     ),
-                ],
+                    if (_showLocationInputs)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
+                          children: [
+                            _buildLocationInput(Icons.radio_button_checked, _fromController, Color(0xFF4CAF50), 'From (Pickup Location)'),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    children: List.generate(2, (index) => Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 1),
+                                      width: 2,
+                                      height: 3,
+                                      color: Colors.grey[400],
+                                    )),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            _buildLocationInput(Icons.location_on, _toController, Color(0xFFFF5252), 'To (Destination)'),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (_toController.text.isNotEmpty && _fromController.text.isNotEmpty) {
+                                    setState(() {
+                                      _showLocationInputs = false;
+                                      _locationConfirmed = true;
+                                      _showTripDetails = true;
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF2196F3),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: const Text('Confirm Location', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
           Expanded(
             child: Stack(
               children: [
@@ -170,9 +187,9 @@ class _OutstationScreenState extends State<OutstationScreen> {
                   ],
                 ),
                 DraggableScrollableSheet(
-                  initialChildSize: 0.4,
-                  minChildSize: 0.4,
-                  maxChildSize: 0.85,
+                  initialChildSize: _locationConfirmed ? 0.4 : 0.15,
+                  minChildSize: _locationConfirmed ? 0.4 : 0.15,
+                  maxChildSize: _locationConfirmed ? 0.85 : 0.15,
                   builder: (context, scrollController) {
                     return Container(
                       decoration: const BoxDecoration(
@@ -200,168 +217,182 @@ class _OutstationScreenState extends State<OutstationScreen> {
                           Expanded(
                             child: ListView(
                               controller: scrollController,
+                              physics: _locationConfirmed ? null : const NeverScrollableScrollPhysics(),
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                               children: [
-                                GestureDetector(
-                                  onTap: () => setState(() => _showTripDetails = !_showTripDetails),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    child: Row(
+                                if (!_locationConfirmed) ...[
+                                  const Text(
+                                    'Plan Your Outstation Trip',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Set your pickup and destination to get started',
+                                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                                  ),
+                                ] else ...[
+                                  GestureDetector(
+                                    onTap: () => setState(() => _showTripDetails = !_showTripDetails),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      child: Row(
+                                        children: [
+                                          const Text('Trip Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                          const Spacer(),
+                                          Icon(
+                                            _showTripDetails ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  if (_showTripDetails)
+                                    const SizedBox(height: 8),
+                                  if (_showTripDetails)
+                                    Row(
                                       children: [
-                                        const Text('Trip Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                        const Spacer(),
-                                        Icon(
-                                          _showTripDetails ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                          color: Colors.grey[600],
-                                        ),
+                                        Expanded(child: _buildTripTypeButton('One Way')),
+                                        const SizedBox(width: 12),
+                                        Expanded(child: _buildTripTypeButton('Round Trip')),
                                       ],
                                     ),
-                                  ),
-                                ),
-                                if (_showTripDetails)
-                                  const SizedBox(height: 8),
-                                if (_showTripDetails)
-                                  Row(
-                                    children: [
-                                      Expanded(child: _buildTripTypeButton('One Way')),
-                                      const SizedBox(width: 12),
-                                      Expanded(child: _buildTripTypeButton('Round Trip')),
-                                    ],
-                                  ),
-                                if (_showTripDetails)
-                                  const SizedBox(height: 16),
-                                if (_showTripDetails)
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildDateInput(_departureDateController, 'Departure Date', Icons.calendar_today),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: _buildTimeInput(_departureTimeController, 'Time', Icons.access_time),
-                                      ),
-                                    ],
-                                  ),
-                                if (_showTripDetails && _tripType == 'Round Trip')
-                                  const SizedBox(height: 12),
-                                if (_showTripDetails && _tripType == 'Round Trip')
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildDateInput(_returnDateController, 'Return Date', Icons.calendar_today),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: _buildTimeInput(_returnTimeController, 'Time', Icons.access_time),
-                                      ),
-                                    ],
-                                  ),
-                                if (_showTripDetails)
-                                  const SizedBox(height: 16),
-                                GestureDetector(
-                                  onTap: () => setState(() => _showVehicleSelection = !_showVehicleSelection),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    child: Row(
+                                  if (_showTripDetails)
+                                    const SizedBox(height: 16),
+                                  if (_showTripDetails)
+                                    Row(
                                       children: [
-                                        const Text('Select Vehicle', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                        const Spacer(),
-                                        Icon(
-                                          _showVehicleSelection ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                          color: Colors.grey[600],
+                                        Expanded(
+                                          child: _buildDateInput(_departureDateController, 'Departure Date', Icons.calendar_today),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                if (_showVehicleSelection)
-                                  const SizedBox(height: 8),
-                                if (_showVehicleSelection)
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue[50],
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: Colors.blue[200]!),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.info_outline, color: Colors.blue[600], size: 16),
                                         const SizedBox(width: 8),
                                         Expanded(
-                                          child: Text(
-                                            'Estimated distance: 45 km • Duration: 1h 30m',
-                                            style: TextStyle(fontSize: 12, color: Colors.blue[700]),
-                                          ),
+                                          child: _buildTimeInput(_departureTimeController, 'Time', Icons.access_time),
                                         ),
                                       ],
                                     ),
+                                  if (_showTripDetails && _tripType == 'Round Trip')
+                                    const SizedBox(height: 12),
+                                  if (_showTripDetails && _tripType == 'Round Trip')
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildDateInput(_returnDateController, 'Return Date', Icons.calendar_today),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: _buildTimeInput(_returnTimeController, 'Time', Icons.access_time),
+                                        ),
+                                      ],
+                                    ),
+                                  if (_showTripDetails)
+                                    const SizedBox(height: 16),
+                                  GestureDetector(
+                                    onTap: () => setState(() => _showVehicleSelection = !_showVehicleSelection),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      child: Row(
+                                        children: [
+                                          const Text('Select Vehicle', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                          const Spacer(),
+                                          Icon(
+                                            _showVehicleSelection ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                if (_showVehicleSelection)
-                                  const SizedBox(height: 16),
-                                if (_showVehicleSelection)
-                                  ..._vehicles.map((v) => _buildVehicleCard(v)),
-                                const SizedBox(height: 80),
+                                  if (_showVehicleSelection)
+                                    const SizedBox(height: 8),
+                                  if (_showVehicleSelection)
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.blue[200]!),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.info_outline, color: Colors.blue[600], size: 16),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'Estimated distance: 45 km • Duration: 1h 30m',
+                                              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (_showVehicleSelection)
+                                    const SizedBox(height: 16),
+                                  if (_showVehicleSelection)
+                                    ..._vehicles.map((v) => _buildVehicleCard(v)),
+                                  const SizedBox(height: 80),
+                                ],
                               ],
                             ),
                           ),
                         ],
                       ),
                     );
-                  },
-                ),
+                    },
+                  ),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
-            ),
-            child: SafeArea(
-              top: false,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _selectedVehicle == null ? null : () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF2196F3),
-                        disabledBackgroundColor: Colors.grey[300],
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(
-                        _selectedVehicle == null ? 'Select a vehicle' : 'Book Outstation',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
-                          fontWeight: FontWeight.w600,
+          if (_locationConfirmed)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
+              ),
+              child: SafeArea(
+                top: false,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _selectedVehicle == null ? null : () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF2196F3),
+                          disabledBackgroundColor: Colors.grey[300],
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Text(
+                          _selectedVehicle == null ? 'Select a vehicle' : 'Book Outstation',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF2196F3), width: 2),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFF2196F3), width: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text('Get Quotes', style: TextStyle(fontSize: 16, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
                       ),
-                      child: const Text('Get Quotes', style: TextStyle(fontSize: 16, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
