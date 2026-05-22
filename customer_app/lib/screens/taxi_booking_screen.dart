@@ -3,6 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
 import 'booking_screen.dart';
+import 'home_screen.dart';
+import 'rating_screen.dart';
 
 class TaxiBookingScreen extends StatefulWidget {
   final String? fromLocation;
@@ -28,6 +30,11 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   bool _showPickupConfirmation = false;
   bool _showWaitingPopup = false;
   int? _selectedTip;
+  bool _isTaxiComing = false;
+  LatLng? _comingTaxiLocation;
+  bool _locationConfirmed = false;
+  bool _showFullTripMap = false;
+  bool _showArrivingButtons = false;
   
   final List<int> _tipAmounts = [10, 20, 50, 100];
 
@@ -37,6 +44,11 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
     // Set default locations
     _pickupController.text = widget.fromLocation ?? 'Current Location';
     _dropController.text = widget.toLocation ?? 'Select Destination';
+    
+    // If locations are already provided, consider it confirmed
+    if (widget.fromLocation != null && widget.toLocation != null) {
+      _locationConfirmed = true;
+    }
   }
 
   // Bike locations near user
@@ -90,104 +102,108 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: Colors.white,
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(Icons.arrow_back, size: 20),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() => _showLocationInputs = true),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      '${_pickupController.text} → ${_dropController.text}',
-                                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(Icons.edit, size: 16, color: Colors.grey[600]),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (_showLocationInputs)
+          if (!_locationConfirmed)
+            Container(
+              color: Colors.white,
+              child: SafeArea(
+                bottom: false,
+                child: Column(
+                  children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Column(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
                         children: [
-                          _buildLocationInput(Icons.radio_button_checked, _pickupController, Color(0xFF4CAF50), 'Current Location'),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Row(
-                              children: [
-                                Column(
-                                  children: List.generate(2, (index) => Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 1),
-                                    width: 2,
-                                    height: 3,
-                                    color: Colors.grey[400],
-                                  )),
-                                ),
-                              ],
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.arrow_back, size: 20),
                             ),
                           ),
-                          _buildLocationInput(Icons.location_on, _dropController, Color(0xFFFF5252), 'Select destination'),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (_dropController.text.isNotEmpty && _dropController.text != 'Select Destination') {
-                                  setState(() => _showLocationInputs = false);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF2196F3),
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => setState(() => _showLocationInputs = true),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey[300]!),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '${_pickupController.text} → ${_dropController.text}',
+                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(Icons.edit, size: 16, color: Colors.grey[600]),
+                                  ],
+                                ),
                               ),
-                              child: const Text('Confirm Location', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600)),
                             ),
                           ),
                         ],
                       ),
                     ),
-                ],
+                    if (_showLocationInputs)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
+                          children: [
+                            _buildLocationInput(Icons.radio_button_checked, _pickupController, Color(0xFF4CAF50), 'Current Location'),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    children: List.generate(2, (index) => Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 1),
+                                      width: 2,
+                                      height: 3,
+                                      color: Colors.grey[400],
+                                    )),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            _buildLocationInput(Icons.location_on, _dropController, Color(0xFFFF5252), 'Select destination'),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (_dropController.text.isNotEmpty && _dropController.text != 'Select Destination') {
+                                    setState(() {
+                                      _showLocationInputs = false;
+                                      _locationConfirmed = true;
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF2196F3),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: const Text('Confirm Location', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
           Expanded(
             child: Stack(
               children: [
@@ -195,22 +211,56 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                   options: MapOptions(
                     initialCenter: LatLng(28.6139, 77.2090),
                     initialZoom: 13.0,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all,
+                    ),
                   ),
                   children: [
                     TileLayer(
                       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.goracabs.customer',
                     ),
+                    if (_isTaxiComing)
+                      PolylineLayer(
+                        polylines: [
+                          if (!_showFullTripMap)
+                            Polyline(
+                              points: [
+                                LatLng(28.6220, 77.2150), // Mock driver location
+                                LatLng(28.6139, 77.2090), // Pickup location
+                              ],
+                              color: const Color(0xFF2196F3),
+                              strokeWidth: 4,
+                            ),
+                          if (_showFullTripMap)
+                            Polyline(
+                              points: [
+                                LatLng(28.6139, 77.2090), // Pickup location
+                                LatLng(28.6200, 77.2300), // Mock drop location
+                              ],
+                              color: const Color(0xFF4CAF50),
+                              strokeWidth: 4,
+                            ),
+                        ],
+                      ),
                     MarkerLayer(
                       markers: [
-                        Marker(
-                          point: LatLng(28.6139, 77.2090),
-                          width: 40,
-                          height: 40,
-                          child: const Icon(Icons.location_on, color: Color(0xFFFF5252), size: 40),
-                        ),
+                        if (!_showFullTripMap)
+                          Marker(
+                            point: LatLng(28.6139, 77.2090),
+                            width: 40,
+                            height: 40,
+                            child: const Icon(Icons.location_on, color: Color(0xFFFF5252), size: 40),
+                          ),
+                        if (_showFullTripMap)
+                          Marker(
+                            point: LatLng(28.6200, 77.2300), // Mock drop location
+                            width: 45,
+                            height: 45,
+                            child: const Icon(Icons.location_on, color: Colors.green, size: 45),
+                          ),
                         // Show bike markers when bike is selected
-                        if (_selectedVehicle == 'Bike')
+                        if (_selectedVehicle == 'Bike' && !_isTaxiComing)
                           ..._bikeLocations.asMap().entries.map((entry) {
                             final index = entry.key;
                             final location = entry.value;
@@ -249,7 +299,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                             );
                           }).toList(),
                         // Show auto markers when auto is selected
-                        if (_selectedVehicle == 'Auto')
+                        if (_selectedVehicle == 'Auto' && !_isTaxiComing)
                           ..._autoLocations.asMap().entries.map((entry) {
                             final index = entry.key;
                             final location = entry.value;
@@ -286,7 +336,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                             );
                           }).toList(),
                         // Show economy car markers when Cab Economy is selected
-                        if (_selectedVehicle == 'Cab Economy')
+                        if (_selectedVehicle == 'Cab Economy' && !_isTaxiComing)
                           ..._economyLocations.asMap().entries.map((entry) {
                             final index = entry.key;
                             final location = entry.value;
@@ -323,7 +373,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                             );
                           }).toList(),
                         // Show SUV markers when SUV is selected
-                        if (_selectedVehicle == 'SUV')
+                        if (_selectedVehicle == 'SUV' && !_isTaxiComing)
                           ..._suvLocations.asMap().entries.map((entry) {
                             final index = entry.key;
                             final location = entry.value;
@@ -360,7 +410,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                             );
                           }).toList(),
                         // Show premium car markers when Premium is selected
-                        if (_selectedVehicle == 'Premium')
+                        if (_selectedVehicle == 'Premium' && !_isTaxiComing)
                           ..._premiumLocations.asMap().entries.map((entry) {
                             final index = entry.key;
                             final location = entry.value;
@@ -396,101 +446,182 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                               ),
                             );
                           }).toList(),
+                        
+                        // Show coming taxi marker when tracking is active
+                        if (_isTaxiComing && _comingTaxiLocation != null && !_showFullTripMap)
+                          Marker(
+                            point: _comingTaxiLocation!,
+                            width: 60,
+                            height: 60,
+                            child: Image.asset(
+                              _selectedVehicle == 'Bike' 
+                                  ? 'assets/images/topview/bike-top.png'
+                                  : _selectedVehicle == 'Auto'
+                                      ? 'assets/images/topview/auto-top.png'
+                                      : _selectedVehicle == 'SUV'
+                                          ? 'assets/images/topview/suv-top.png'
+                                          : _selectedVehicle == 'Premium'
+                                              ? 'assets/images/topview/primium-top.png'
+                                              : 'assets/images/topview/economy-top.png',
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF2196F3),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 2),
+                                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                ),
+                                child: Icon(
+                                  _vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['icon'] as IconData,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ],
                 ),
-                DraggableScrollableSheet(
-                  initialChildSize: _showPickupConfirmation ? 0.18 : 0.4,
-                  minChildSize: _showPickupConfirmation ? 0.18 : 0.4,
-                  maxChildSize: _showPickupConfirmation ? 0.18 : 0.4,
-                  builder: (context, scrollController) {
-                    return Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 10,
-                            offset: Offset(0, -2),
-                          ),
-                        ],
+                if (_showFullTripMap)
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                          ],
+                        ),
+                        child: const Icon(Icons.arrow_back, color: Colors.black87, size: 24),
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 12),
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                if (_showFullTripMap || _showArrivingButtons)
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Column(
+                      children: [
+                        FloatingActionButton.small(
+                          heroTag: 'support_btn_map',
+                          onPressed: () {},
+                          backgroundColor: Colors.white,
+                          child: const Icon(Icons.support_agent, color: Colors.black87),
+                        ),
+                        const SizedBox(height: 12),
+                        FloatingActionButton.small(
+                          heroTag: 'share_btn_map',
+                          onPressed: () {},
+                          backgroundColor: Colors.white,
+                          child: const Icon(Icons.share, color: Colors.black87),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (!_showFullTripMap)
+                  DraggableScrollableSheet(
+                    initialChildSize: _showPickupConfirmation ? 0.18 : 0.4,
+                    minChildSize: _showPickupConfirmation ? 0.18 : 0.4,
+                    maxChildSize: _showPickupConfirmation ? 0.18 : 0.4,
+                    builder: (context, scrollController) {
+                      return Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: Offset(0, -2),
                             ),
-                          ),
-                          Expanded(
-                            child: ListView(
-                              controller: scrollController,
-                              physics: _showPickupConfirmation ? const NeverScrollableScrollPhysics() : null,
-                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                              children: [
-                                if (_showPickupConfirmation) ...[
-                                  const Text(
-                                    'Double Check Pickup Point',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue[50],
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: Colors.blue[200]!),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 12),
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView(
+                                controller: scrollController,
+                                physics: _showPickupConfirmation ? const NeverScrollableScrollPhysics() : null,
+                                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                children: [
+                                  if (_showPickupConfirmation) ...[
+                                    const Text(
+                                      'Double Check Pickup Point',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.location_on, color: Colors.green[600], size: 18),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            _pickupController.text,
-                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.blue[200]!),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.location_on, color: Colors.green[600], size: 18),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              _pickupController.text,
+                                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ] else ...[
-                                  const Text('Select Vehicle', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  ] else ...[
+                                    const Text('Select Vehicle', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  ],
+                                  const SizedBox(height: 16),
+                                  if (!_showPickupConfirmation) ...[
+                                    ..._vehicles.map((v) => _buildVehicleCard(v)),
+                                    const SizedBox(height: 80),
+                                  ],
                                 ],
-                                const SizedBox(height: 16),
-                                if (!_showPickupConfirmation) ...[
-                                  ..._vehicles.map((v) => _buildVehicleCard(v)),
-                                  const SizedBox(height: 80),
-                                ],
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
-            ),
-            child: SafeArea(
-              top: false,
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _selectedVehicle == null ? null : () {
+          if (!_showFullTripMap)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
+              ),
+              child: SafeArea(
+                top: false,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _selectedVehicle == null ? null : () {
+                    setState(() {
+                      _locationConfirmed = true; // Ensure header is hidden when booking starts
+                    });
                     if (_showPickupConfirmation) {
                       // Show waiting popup
                       _showWaitingDialog();
@@ -500,24 +631,24 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                       });
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2196F3),
-                    disabledBackgroundColor: Colors.grey[300],
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text(
-                    _selectedVehicle == null ? 'Select a vehicle' : _showPickupConfirmation ? 'Confirm Pickup' : 'Book Now',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
-                      fontWeight: FontWeight.w600,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF2196F3),
+                      disabledBackgroundColor: Colors.grey[300],
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text(
+                      _selectedVehicle == null ? 'Select a vehicle' : _showPickupConfirmation ? 'Confirm Pickup' : 'Book Now',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -764,6 +895,14 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
       enableDrag: false,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
+        // Auto-close after 3 seconds and show driver details
+        Future.delayed(const Duration(seconds: 3), () {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+            _showDriverArrivingDialog();
+          }
+        });
+
         return Container(
           padding: const EdgeInsets.all(20),
           decoration: const BoxDecoration(
@@ -850,10 +989,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop(); // Go back to previous screen
-                      },
+                      onPressed: () => _showCancelReasonDialog(),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.red),
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -883,6 +1019,409 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                 ],
               ),
               const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDriverArrivingDialog() {
+    final selectedVehicleData = _vehicles.firstWhere((v) => v['name'] == _selectedVehicle);
+    
+    // Start tracking on map
+    setState(() {
+      _isTaxiComing = true;
+      _showArrivingButtons = true;
+      // Set a mock location for the coming taxi (nearby)
+      _comingTaxiLocation = LatLng(28.6220, 77.2150);
+    });
+    
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.transparent, // Don't dim the map
+      builder: (BuildContext context) {
+        // Auto-close after 5 seconds and show full map
+        Future.delayed(const Duration(seconds: 5), () {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+            setState(() {
+              _showFullTripMap = true;
+              _showArrivingButtons = false;
+            });
+            // Start simulation for ride ending after another 5 seconds
+            Future.delayed(const Duration(seconds: 5), () {
+              _showRideCompletedDialog();
+            });
+          }
+        });
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [
+              BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -2)),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const Text(
+                'Your taxi on the way',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text('Ride PIN: ', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: const Text(
+                      '4829',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              
+              // ETA and Distance Info
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  children: [
+                    const Icon(Icons.access_time_filled, color: Color(0xFF2196F3), size: 18),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Arriving in 4 mins',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(width: 1, height: 15, color: Colors.grey[300]),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.location_on, color: Colors.green, size: 18),
+                    const SizedBox(width: 8),
+                    const Text(
+                      '1.2 km away',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              
+              // Driver Card
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey[200]!),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // Driver Profile Image (Now on the left)
+                    Container(
+                      width: 55,
+                      height: 55,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey[200]!, width: 2),
+                        image: const DecorationImage(
+                          image: NetworkImage('https://i.pravatar.cc/150?u=rajesh'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Driver Details
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Rajesh Kumar',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.star, color: Colors.amber, size: 16),
+                              SizedBox(width: 4),
+                              Text('4.9 (1.2k+ rides)', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'White Swift Dzire • DL 01 AB 1234',
+                            style: TextStyle(fontSize: 11, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Vehicle Image (Now on the right and larger)
+                    SizedBox(
+                      width: 90,
+                      height: 70,
+                      child: Image.asset(
+                        selectedVehicleData['image'],
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          selectedVehicleData['icon'], 
+                          color: selectedVehicleData['color'],
+                          size: 40,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.call, color: Colors.green),
+                      label: const Text('Call', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.grey[200]!),
+                        ),
+                        elevation: 2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.message, color: Color(0xFF2196F3)),
+                      label: const Text('Message', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.grey[200]!),
+                        ),
+                        elevation: 2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _showArrivingButtons = false;
+                    });
+                    _showCancelReasonDialog();
+                  },
+                  child: const Text('Cancel Ride', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 15)),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCancelReasonDialog() {
+    final List<String> reasons = [
+      'Plan changed',
+      'Driver is too far',
+      'Found another ride',
+      'Wait time is too long',
+      'Wrong location selected',
+      'Other'
+    ];
+    String? selectedReason;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const Text(
+                    'Cancel Ride',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Please select a reason for cancellation',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
+                  ...reasons.map((reason) => RadioListTile<String>(
+                    title: Text(reason, style: const TextStyle(fontSize: 15)),
+                    value: reason,
+                    groupValue: selectedReason,
+                    activeColor: const Color(0xFF2196F3),
+                    contentPadding: EdgeInsets.zero,
+                    onChanged: (value) {
+                      setDialogState(() {
+                        selectedReason = value;
+                      });
+                    },
+                  )),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: selectedReason == null ? null : () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          (route) => false,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2196F3),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text(
+                        'Confirm Cancellation',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Back', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showRideCompletedDialog() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 64),
+              const SizedBox(height: 16),
+              const Text(
+                'Ride Completed!',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'You have reached your destination safely.',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RatingScreen(
+                          driverName: 'Rajesh Kumar',
+                          vehicleName: _selectedVehicle!,
+                          selectedTip: _selectedTip,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2196F3),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text(
+                    'Rate Your Ride',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+              ),
             ],
           ),
         );
