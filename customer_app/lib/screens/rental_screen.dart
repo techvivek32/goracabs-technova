@@ -258,7 +258,7 @@ class _RentalScreenState extends State<RentalScreen> {
             ),
             child: ElevatedButton(
               onPressed: _selectedPackage == null || _selectedVehicle == null ? null : () {
-                _showBookingSuccessDialog();
+                _showBookingConfirmationDialog();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF2196F3),
@@ -394,6 +394,278 @@ class _RentalScreenState extends State<RentalScreen> {
           Text(packageData['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
         ],
       ),
+    );
+  }
+
+  void _showBookingConfirmationDialog() {
+    final packageData = _packages.firstWhere((p) => p['duration'] == _selectedPackage);
+    final vehicleData = _vehicles.firstWhere((v) => v['name'] == _selectedVehicle);
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.directions_car, color: Color(0xFF2196F3)),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Rental Package',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, size: 20),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Pickup and Drop locations
+                      Row(
+                        children: [
+                          Column(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF4CAF50),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              Container(
+                                width: 2,
+                                height: 40,
+                                color: Colors.grey[300],
+                              ),
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFFF5252),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Pick-up', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _pickupController.text.isEmpty ? 'Current Location' : _pickupController.text,
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 24),
+                                const Text('Drop-off', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _dropController.text.isEmpty ? 'Select destination' : _dropController.text,
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Date and Time
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _selectedDate == null 
+                                    ? 'Today' 
+                                    : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Time', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _selectedTime == null 
+                                    ? 'Now' 
+                                    : _selectedTime!.format(context),
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Price breakdown
+                      const Text('Price breakdown', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Base price (${packageData['duration']})', style: const TextStyle(fontSize: 14)),
+                          Text(packageData['price'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Vehicle ($_selectedVehicle)', style: const TextStyle(fontSize: 14)),
+                          const Text('Included', style: TextStyle(fontSize: 14, color: Colors.green)),
+                        ],
+                      ),
+                      
+                      const Divider(height: 24),
+                      
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Total price', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(
+                            packageData['price'],
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2196F3)),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Things to keep in mind
+                      const Text('Things to keep in mind', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      
+                      _buildConditionItem(
+                        Icons.toll,
+                        'Tolls and interstate charges are extra',
+                        'Final charges may vary based on your route - pay the driver directly',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildConditionItem(
+                        Icons.local_parking,
+                        'Parking charges',
+                        'Extra charges apply for paid parking',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildConditionItem(
+                        Icons.schedule,
+                        'Extra time charges',
+                        'Additional ₹150/hour beyond package duration',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Book button
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showBookingSuccessDialog();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2196F3),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text(
+                      'Confirm Booking',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildConditionItem(IconData icon, String title, String subtitle) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 20, color: Colors.grey[600]),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
+              Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

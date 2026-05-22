@@ -55,7 +55,11 @@ class RideHistoryScreen extends StatelessWidget {
         title: const Text('Ride History', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
         centerTitle: false,
       ),
       body: ListView.separated(
