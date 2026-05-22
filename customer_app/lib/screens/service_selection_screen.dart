@@ -10,7 +10,7 @@ class ServiceSelectionScreen extends StatelessWidget {
 
   final List<Map<String, dynamic>> _services = const [
     {'icon': 'assets/images/texi.png', 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
-    {'icon': 'assets/images/outstation.png', 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
+    {'icon': 'assets/images/out-station.png', 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
     {'icon': 'assets/images/rental.png', 'label': 'Rental', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
     {'icon': 'assets/images/hiredriver.png', 'label': 'Hire Driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
     {'icon': 'assets/images/parcel.jpg', 'label': 'Parcel', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
