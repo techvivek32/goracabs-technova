@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
 import 'booking_screen.dart';
+import 'booking_inquiry_screen.dart';
 
 class OutstationScreen extends StatefulWidget {
   const OutstationScreen({super.key});
@@ -26,11 +27,10 @@ class _OutstationScreenState extends State<OutstationScreen> {
   bool _locationConfirmed = false;
 
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Sedan', 'type': 'Comfortable', 'price': '₹12/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'https://cdn-icons-png.flaticon.com/512/3202/3202926.png'},
-    {'name': 'SUV', 'type': 'Spacious', 'price': '₹15/km', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097132.png'},
-    {'name': 'Hatchback', 'type': 'Economy', 'price': '₹10/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50), 'image': 'https://cdn-icons-png.flaticon.com/512/3202/3202003.png'},
-    {'name': 'Premium SUV', 'type': 'Luxury', 'price': '₹20/km', 'capacity': '6', 'icon': Icons.car_rental, 'color': Color(0xFF795548), 'image': 'https://cdn-icons-png.flaticon.com/512/3097/3097150.png'},
-    {'name': 'Tempo Traveller', 'type': 'Group Travel', 'price': '₹25/km', 'capacity': '12', 'icon': Icons.bus_alert, 'color': Color(0xFFFF9800), 'image': 'https://cdn-icons-png.flaticon.com/512/2972/2972185.png'},
+    {'name': 'Economy', 'type': 'Comfortable', 'oneWayPrice': '₹2,500', 'roundTripPrice': '₹4,800', 'capacity': '4', 'icon': Icons.directions_car, 'image': 'assets/images/economy.png'},
+    {'name': 'Sedan', 'type': 'Premium', 'oneWayPrice': '₹3,200', 'roundTripPrice': '₹6,200', 'capacity': '4', 'icon': Icons.directions_car, 'image': 'assets/images/texi.png'},
+    {'name': 'SUV', 'type': 'Spacious', 'oneWayPrice': '₹4,500', 'roundTripPrice': '₹8,800', 'capacity': '6', 'icon': Icons.airport_shuttle, 'image': 'assets/images/texi2.png'},
+    {'name': 'Premium', 'type': 'Luxury', 'oneWayPrice': '₹5,800', 'roundTripPrice': '₹11,200', 'capacity': '4', 'icon': Icons.car_rental, 'image': 'assets/images/texi3.png'},
   ];
 
   @override
@@ -329,7 +329,13 @@ class _OutstationScreenState extends State<OutstationScreen> {
                                   if (_showVehicleSelection)
                                     const SizedBox(height: 16),
                                   if (_showVehicleSelection)
-                                    ..._vehicles.map((v) => _buildVehicleCard(v)),
+                                    Column(
+                                      children: _vehicles.map((v) => _buildVehicleCard(v)).toList(),
+                                    ),
+                                  if (_showVehicleSelection)
+                                    const SizedBox(height: 20),
+                                  if (_showVehicleSelection)
+                                    _buildTripConditions(),
                                   const SizedBox(height: 80),
                                 ],
                               ],
@@ -352,44 +358,27 @@ class _OutstationScreenState extends State<OutstationScreen> {
               ),
               child: SafeArea(
                 top: false,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _selectedVehicle == null ? null : () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF2196F3),
-                          disabledBackgroundColor: Colors.grey[300],
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: Text(
-                          _selectedVehicle == null ? 'Select a vehicle' : 'Book Outstation',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _selectedVehicle == null ? null : () {
+                      _showBookingConfirmationDialog();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF2196F3),
+                      disabledBackgroundColor: Colors.grey[300],
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text(
+                      _selectedVehicle == null ? 'Select a vehicle' : 'Book Trip',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _selectedVehicle == null ? Colors.grey[600] : Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DriverBiddingScreen()));
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFF2196F3), width: 2),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: const Text('Get Quotes', style: TextStyle(fontSize: 16, color: Color(0xFF2196F3), fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -547,55 +536,52 @@ class _OutstationScreenState extends State<OutstationScreen> {
 
   Widget _buildVehicleCard(Map<String, dynamic> v) {
     final isSelected = _selectedVehicle == v['name'];
+    final currentPrice = _tripType == 'One Way' ? v['oneWayPrice'] : v['roundTripPrice'];
+    
     return GestureDetector(
       onTap: () => setState(() => _selectedVehicle = v['name']),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? (v['color'] as Color).withOpacity(0.05) : Colors.white,
+          color: isSelected ? Color(0xFF2196F3).withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? (v['color'] as Color) : Colors.grey[300]!, 
+            color: isSelected ? Color(0xFF2196F3) : Colors.grey[300]!, 
             width: isSelected ? 2 : 1
           ),
         ),
         child: Row(
           children: [
             Container(
-              width: 50,
+              width: 60,
               height: 50,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: (v['color'] as Color).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Image.network(
+              child: Image.asset(
                 v['image'],
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  return Icon(v['icon'], color: v['color'] as Color, size: 24);
+                  return Icon(v['icon'], color: Color(0xFF2196F3), size: 40);
                 },
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(v['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 2),
-                  Text('${v['type']} • ${v['capacity']} seats', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                  Text(v['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 4),
+                  Text('${v['type']} • ${v['capacity']} seats', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(v['price'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: v['color'] as Color)),
-                const SizedBox(height: 2),
+                Text(currentPrice, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF4CAF50))),
+                const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: Color(0xFF4CAF50).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -605,6 +591,489 @@ class _OutstationScreenState extends State<OutstationScreen> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTripConditions() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Color(0xFF2196F3).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.info_outline, color: Color(0xFF2196F3), size: 20),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${_tripType} Trip Conditions',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (_tripType == 'One Way') ...[
+            _buildConditionItem(
+              Icons.toll,
+              'Tolls and state taxi extra pay',
+            ),
+            const SizedBox(height: 8),
+            _buildConditionItem(
+              Icons.local_parking,
+              'Parking charges extra',
+            ),
+          ] else ...[
+            _buildConditionItem(
+              Icons.toll,
+              'Tolls and state taxi extra pay',
+            ),
+            const SizedBox(height: 8),
+            _buildConditionItem(
+              Icons.local_parking,
+              'Parking charges extra',
+            ),
+            const SizedBox(height: 8),
+            _buildConditionItem(
+              Icons.route,
+              'Minimum per day 250km running',
+            ),
+            const SizedBox(height: 8),
+            _buildConditionItem(
+              Icons.add_road,
+              'Per km will be charged for extra km',
+            ),
+            const SizedBox(height: 8),
+            _buildConditionItem(
+              Icons.person,
+              'Driver allowance per 24 hours - ₹250',
+            ),
+            const SizedBox(height: 8),
+            _buildConditionItem(
+              Icons.nightlight,
+              'Night time drive allowance (11:00PM - 06:00AM) - ₹250/night',
+            ),
+          ],
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.payment, color: Colors.orange, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Customer - pay the driver directly',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.orange[800],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConditionItem(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icon, size: 16, color: Colors.grey[600]),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[700],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showBookingConfirmationDialog() {
+    final selectedVehicleData = _vehicles.firstWhere((v) => v['name'] == _selectedVehicle);
+    final currentPrice = _tripType == 'One Way' ? selectedVehicleData['oneWayPrice'] : selectedVehicleData['roundTripPrice'];
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on, color: Color(0xFF2196F3)),
+                    const SizedBox(width: 8),
+                    Text(
+                      '$_tripType Trip',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, size: 20),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Pickup and Drop locations
+                      Row(
+                        children: [
+                          Column(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF4CAF50),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              Container(
+                                width: 2,
+                                height: 40,
+                                color: Colors.grey[300],
+                              ),
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFFF5252),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('From', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _fromController.text.isEmpty ? 'Current Location' : _fromController.text,
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 24),
+                                const Text('To', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _toController.text.isEmpty ? 'Select destination' : _toController.text,
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Trip Details
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Departure Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _departureDateController.text.isEmpty ? 'Today' : _departureDateController.text,
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Time', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                Text(
+                                  _departureTimeController.text.isEmpty ? 'Now' : _departureTimeController.text,
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      if (_tripType == 'Round Trip') ...[
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Return Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  Text(
+                                    _returnDateController.text.isEmpty ? 'Select date' : _returnDateController.text,
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Return Time', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  Text(
+                                    _returnTimeController.text.isEmpty ? 'Select time' : _returnTimeController.text,
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Vehicle and Price
+                      const Text('Trip Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Vehicle ($_selectedVehicle)', style: const TextStyle(fontSize: 14)),
+                          Text(currentPrice, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Trip Type', style: const TextStyle(fontSize: 14)),
+                          Text(_tripType, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                      
+                      const Divider(height: 24),
+                      
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Total price', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(
+                            currentPrice,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Conditions
+                      const Text('Trip Conditions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      
+                      if (_tripType == 'One Way') ...[
+                        _buildDialogConditionItem(Icons.toll, 'Tolls and state taxi extra pay'),
+                        const SizedBox(height: 8),
+                        _buildDialogConditionItem(Icons.local_parking, 'Parking charges extra'),
+                      ] else ...[
+                        _buildDialogConditionItem(Icons.toll, 'Tolls and state taxi extra pay'),
+                        const SizedBox(height: 8),
+                        _buildDialogConditionItem(Icons.local_parking, 'Parking charges extra'),
+                        const SizedBox(height: 8),
+                        _buildDialogConditionItem(Icons.route, 'Minimum per day 250km running'),
+                        const SizedBox(height: 8),
+                        _buildDialogConditionItem(Icons.person, 'Driver allowance per 24 hours - ₹250'),
+                        const SizedBox(height: 8),
+                        _buildDialogConditionItem(Icons.nightlight, 'Night drive allowance - ₹250/night'),
+                      ],
+                      
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.payment, color: Colors.orange, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Customer - pay the driver directly',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.orange[800],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Book button
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _navigateToBookingInquiry();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2196F3),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text(
+                      'Confirm Booking',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDialogConditionItem(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 20, color: Colors.grey[600]),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _navigateToBookingInquiry() {
+    final inquiryId = '${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookingInquiryScreen(
+          inquiryId: inquiryId,
+          pickupLocation: _fromController.text.isNotEmpty 
+              ? _fromController.text 
+              : '5Centers, 9, 5Centers, Jodhpur, Rajasthan, India, 342011',
+          dropLocation: _toController.text.isNotEmpty 
+              ? _toController.text 
+              : 'Jaipur railway station, Gopalbari, Jaipur, Rajasthan, India',
+          carType: '$_selectedVehicle Luxury',
+          gearType: 'Automatic',
+          tripStartDate: _departureDateController.text.isNotEmpty 
+              ? _departureDateController.text 
+              : '2025-12-05',
+          tripEndDate: _tripType == 'Round Trip' && _returnDateController.text.isNotEmpty
+              ? _returnDateController.text 
+              : '2025-12-06',
+          tripTime: _departureTimeController.text.isNotEmpty 
+              ? _departureTimeController.text 
+              : '10:07 PM',
         ),
       ),
     );
