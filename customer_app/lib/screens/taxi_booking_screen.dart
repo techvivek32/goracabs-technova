@@ -431,6 +431,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                           Expanded(
                             child: ListView(
                               controller: scrollController,
+                              physics: _showPickupConfirmation ? const NeverScrollableScrollPhysics() : null,
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                               children: [
                                 if (_showPickupConfirmation) ...[
@@ -463,8 +464,10 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                                   const Text('Select Vehicle', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                 ],
                                 const SizedBox(height: 16),
-                                if (!_showPickupConfirmation) ..._vehicles.map((v) => _buildVehicleCard(v)),
-                                const SizedBox(height: 80),
+                                if (!_showPickupConfirmation) ...[
+                                  ..._vehicles.map((v) => _buildVehicleCard(v)),
+                                  const SizedBox(height: 80),
+                                ],
                               ],
                             ),
                           ),
@@ -638,17 +641,13 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
-                  ),
-                  const SizedBox(height: 16),
                   const Text(
-                    'Please Wait',
+                    'Add Tip',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Looking for someone to accept your ride...',
+                    'Support your driver by adding a tip',
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
@@ -668,18 +667,13 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          '(No tip added)',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          _selectedTip != null ? '(₹$_selectedTip tip added)' : '(No tip added)',
+                          style: TextStyle(fontSize: 12, color: _selectedTip != null ? Colors.green : Colors.grey[600]),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Add Tip',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     children: _tipAmounts.map((amount) {
@@ -717,16 +711,15 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                         child: OutlinedButton(
                           onPressed: () {
                             Navigator.of(context).pop();
-                            Navigator.of(context).pop(); // Go back to previous screen
                           },
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.red),
+                            side: const BorderSide(color: Colors.grey),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                           child: const Text(
-                            'Cancel Booking',
-                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                            'Back',
+                            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),
@@ -744,7 +737,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                           child: Text(
-                            _selectedTip != null ? 'Add Tip ₹$_selectedTip' : 'Skip Tip',
+                            _selectedTip != null ? 'Confirm with ₹$_selectedTip Tip' : 'Confirm Ride',
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                           ),
                         ),
