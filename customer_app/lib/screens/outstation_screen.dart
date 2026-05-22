@@ -1065,6 +1065,7 @@ class _OutstationScreenState extends State<OutstationScreen> {
               : 'Jaipur railway station, Gopalbari, Jaipur, Rajasthan, India',
           carType: '$_selectedVehicle Luxury',
           gearType: 'Automatic',
+          tripType: _tripType,
           tripStartDate: _departureDateController.text.isNotEmpty 
               ? _departureDateController.text 
               : '2025-12-05',
