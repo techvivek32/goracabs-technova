@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'invoice_screen.dart';
+import 'home_screen.dart';
+import 'service_selection_screen.dart';
 
-class RideHistoryScreen extends StatelessWidget {
+class RideHistoryScreen extends StatefulWidget {
   const RideHistoryScreen({super.key});
+
+  @override
+  State<RideHistoryScreen> createState() => _RideHistoryScreenState();
+}
+
+class _RideHistoryScreenState extends State<RideHistoryScreen> {
+  int _currentIndex = 2;
+  bool _isRideHistoryExpanded = false;
+  bool _isRentalPackagesExpanded = false;
+  bool _isHireDriverExpanded = false;
+  bool _isOutstationExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +65,7 @@ class RideHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ride History', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text('Trip Details', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: true,
@@ -62,150 +75,614 @@ class RideHistoryScreen extends StatelessWidget {
         ),
         centerTitle: false,
       ),
-      body: ListView.separated(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        itemCount: rides.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
-        itemBuilder: (_, i) {
-          final ride = rides[i];
-          final isCancelled = ride['status'] == 'Cancelled';
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[300]!),
+        child: Column(
+          children: [
+            _buildExpandableSection(
+              'Ride History',
+              Icons.directions_car,
+              _isRideHistoryExpanded,
+              () => setState(() => _isRideHistoryExpanded = !_isRideHistoryExpanded),
+              _buildRideHistoryList(),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isCancelled ? Colors.red[50] : Colors.green[50],
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        ride['status'] as String,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: isCancelled ? Colors.red : Colors.green,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(ride['date'] as String, style: const TextStyle(fontSize: 12, color: AppTheme.textGrey)),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.green, width: 2),
-                          ),
-                        ),
-                        Container(
-                          width: 2,
-                          height: 30,
-                          color: Colors.grey[300],
-                        ),
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.red, width: 2),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(ride['from'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 24),
-                          Text(ride['to'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(height: 24),
-                Row(
-                  children: [
-                    const Icon(Icons.person_outline, size: 18, color: AppTheme.textGrey),
-                    const SizedBox(width: 6),
-                    Text(ride['driver'] as String, style: const TextStyle(fontSize: 13)),
-                    const SizedBox(width: 16),
-                    const Icon(Icons.directions_car, size: 18, color: AppTheme.textGrey),
-                    const SizedBox(width: 6),
-                    Text(ride['vehicle'] as String == 'Gora Go' ? 'Bike' : 
-                         ride['vehicle'] as String == 'Gora Sedan' ? 'Cab Economy' : 
-                         ride['vehicle'] as String == 'Gora SUV' ? 'SUV' : 'Premium', 
-                         style: const TextStyle(fontSize: 13)),
-                    const Spacer(),
-                    Text(ride['fare'] as String, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
-                  ],
-                ),
-                if (!isCancelled) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      if ((ride['rating'] as double) > 0) ...[
-                        const Icon(Icons.star, color: Colors.amber, size: 18),
-                        const SizedBox(width: 4),
-                        Text('${ride['rating']}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                      ] else
-                        TextButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) => RatingDialog(driver: ride['driver'] as String),
-                            );
-                          },
-                          child: const Text('Rate this ride', style: TextStyle(color: AppTheme.primaryBlue)),
-                        ),
-                      const Spacer(),
-                      TextButton.icon(
-                        onPressed: () {
-                          final String originalVehicle = ride['vehicle'] as String;
-                          final String mappedVehicle = originalVehicle == 'Gora Go' ? 'Bike' : 
-                                                     originalVehicle == 'Gora Sedan' ? 'Cab Economy' : 
-                                                     originalVehicle == 'Gora SUV' ? 'SUV' : 'Premium';
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => InvoiceScreen(
-                                vehicleName: mappedVehicle,
-                                selectedTip: 0,
-                              ),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.receipt_long, size: 16),
-                        label: const Text('Invoice'),
-                        style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
-                      ),
-                    ],
+            const SizedBox(height: 16),
+            _buildExpandableSection(
+              'Rental Packages',
+              Icons.schedule,
+              _isRentalPackagesExpanded,
+              () => setState(() => _isRentalPackagesExpanded = !_isRentalPackagesExpanded),
+              _buildRentalPackagesList(),
+            ),
+            const SizedBox(height: 16),
+            _buildExpandableSection(
+              'Hire Driver',
+              Icons.person,
+              _isHireDriverExpanded,
+              () => setState(() => _isHireDriverExpanded = !_isHireDriverExpanded),
+              _buildHireDriverList(),
+            ),
+            const SizedBox(height: 16),
+            _buildExpandableSection(
+              'Outstation',
+              Icons.location_on,
+              _isOutstationExpanded,
+              () => setState(() => _isOutstationExpanded = !_isOutstationExpanded),
+              _buildOutstationList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandableSection(String title, IconData icon, bool isExpanded, VoidCallback onTap, Widget content) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(icon, color: AppTheme.primaryBlue, size: 20),
+                  const SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    color: Colors.grey[600],
                   ),
                 ],
-              ],
+              ),
             ),
-          );
-        },
+          ),
+          if (isExpanded) ...[
+            const Divider(height: 1),
+            content,
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRideHistoryList() {
+    final rides = [
+      {
+        'date': 'Today, 10:30 AM',
+        'from': 'MG Road, Delhi',
+        'to': 'Cyber City, Gurugram',
+        'driver': 'Rajesh Kumar',
+        'fare': '₹120',
+        'status': 'Completed',
+        'rating': 4.5,
+        'vehicle': 'Gora Go',
+      },
+      {
+        'date': 'Yesterday, 5:45 PM',
+        'from': 'Connaught Place',
+        'to': 'Dwarka Sector 21',
+        'driver': 'Amit Singh',
+        'fare': '₹180',
+        'status': 'Completed',
+        'rating': 5.0,
+        'vehicle': 'Gora Sedan',
+      },
+    ];
+
+    return Column(
+      children: rides.map((ride) => _buildRideCard(ride)).toList(),
+    );
+  }
+
+  Widget _buildRentalPackagesList() {
+    final rentals = [
+      {
+        'date': '12 Jan, 9:00 AM',
+        'package': '8 Hours Package',
+        'vehicle': 'Economy',
+        'fare': '₹1,500',
+        'status': 'Completed',
+        'duration': '8 hours',
+      },
+    ];
+
+    return Column(
+      children: rentals.map((rental) => _buildRentalCard(rental)).toList(),
+    );
+  }
+
+  Widget _buildHireDriverList() {
+    final hireDrivers = [
+      {
+        'date': '10 Jan, 2:00 PM',
+        'duration': '4 hours',
+        'driver': 'Mohan Singh',
+        'fare': '₹800',
+        'status': 'Completed',
+      },
+    ];
+
+    return Column(
+      children: hireDrivers.map((hire) => _buildHireDriverCard(hire)).toList(),
+    );
+  }
+
+  Widget _buildOutstationList() {
+    final outstations = [
+      {
+        'date': '8 Jan, 6:00 AM',
+        'from': 'Delhi',
+        'to': 'Agra',
+        'driver': 'Ravi Kumar',
+        'fare': '₹3,500',
+        'status': 'Completed',
+        'vehicle': 'Sedan',
+      },
+    ];
+
+    return Column(
+      children: outstations.map((outstation) => _buildOutstationCard(outstation)).toList(),
+    );
+  }
+
+  Widget _buildRideCard(Map<String, dynamic> ride) {
+    final isCancelled = ride['status'] == 'Cancelled';
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isCancelled ? Colors.red[50] : Colors.green[50],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  ride['status'] as String,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isCancelled ? Colors.red : Colors.green,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(ride['date'] as String, style: const TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Container(
+                    width: 2,
+                    height: 20,
+                    color: Colors.grey[300],
+                  ),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(ride['from'] as String, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 16),
+                    Text(ride['to'] as String, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              Text(ride['fare'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+            ],
+          ),
+          if (!isCancelled) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: () {
+                  final String originalVehicle = ride['vehicle'] as String;
+                  final String mappedVehicle = originalVehicle == 'Gora Go' ? 'Bike' : 
+                                             originalVehicle == 'Gora Sedan' ? 'Cab Economy' : 
+                                             originalVehicle == 'Gora SUV' ? 'SUV' : 'Premium';
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InvoiceScreen(
+                        vehicleName: mappedVehicle,
+                        selectedTip: 0,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.receipt_long, size: 14),
+                label: const Text('Invoice', style: TextStyle(fontSize: 12)),
+                style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRentalCard(Map<String, dynamic> rental) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.schedule, color: AppTheme.primaryBlue, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(rental['package'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    Text('${rental['vehicle']} • ${rental['duration']}', style: const TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                    Text(rental['date'] as String, style: const TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+                  ],
+                ),
+              ),
+              Text(rental['fare'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () => _showRentalDetails(rental),
+                  icon: const Icon(Icons.info_outline, size: 14),
+                  label: const Text('Details', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => InvoiceScreen(
+                          vehicleName: rental['vehicle'] as String,
+                          selectedTip: 0,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.receipt_long, size: 14),
+                  label: const Text('Invoice', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHireDriverCard(Map<String, dynamic> hire) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.person, color: AppTheme.primaryBlue, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Driver: ${hire['driver']}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    Text('Duration: ${hire['duration']}', style: const TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                    Text(hire['date'] as String, style: const TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+                  ],
+                ),
+              ),
+              Text(hire['fare'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () => _showHireDriverDetails(hire),
+                  icon: const Icon(Icons.info_outline, size: 14),
+                  label: const Text('Details', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => InvoiceScreen(
+                          vehicleName: 'Hire Driver',
+                          selectedTip: 0,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.receipt_long, size: 14),
+                  label: const Text('Invoice', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOutstationCard(Map<String, dynamic> outstation) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.location_on, color: AppTheme.primaryBlue, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${outstation['from']} → ${outstation['to']}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    Text('${outstation['vehicle']} • ${outstation['driver']}', style: const TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                    Text(outstation['date'] as String, style: const TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+                  ],
+                ),
+              ),
+              Text(outstation['fare'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () => _showOutstationDetails(outstation),
+                  icon: const Icon(Icons.info_outline, size: 14),
+                  label: const Text('Details', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => InvoiceScreen(
+                          vehicleName: outstation['vehicle'] as String,
+                          selectedTip: 0,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.receipt_long, size: 14),
+                  label: const Text('Invoice', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRentalDetails(Map<String, dynamic> rental) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.schedule, color: AppTheme.primaryBlue),
+              const SizedBox(width: 8),
+              const Text('Rental Package Details'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow('Package', rental['package'] as String),
+              _buildDetailRow('Vehicle', rental['vehicle'] as String),
+              _buildDetailRow('Duration', rental['duration'] as String),
+              _buildDetailRow('Date & Time', rental['date'] as String),
+              _buildDetailRow('Status', rental['status'] as String),
+              _buildDetailRow('Total Fare', rental['fare'] as String),
+              const SizedBox(height: 16),
+              const Text('Package Includes:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text('• Unlimited stops within package duration'),
+              const Text('• Fixed pricing, no surge charges'),
+              const Text('• Professional driver'),
+              const Text('• Fuel included'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHireDriverDetails(Map<String, dynamic> hire) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.person, color: AppTheme.primaryBlue),
+              const SizedBox(width: 8),
+              const Text('Hire Driver Details'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow('Driver Name', hire['driver'] as String),
+              _buildDetailRow('Duration', hire['duration'] as String),
+              _buildDetailRow('Date & Time', hire['date'] as String),
+              _buildDetailRow('Status', hire['status'] as String),
+              _buildDetailRow('Total Fare', hire['fare'] as String),
+              const SizedBox(height: 16),
+              const Text('Service Includes:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text('• Experienced professional driver'),
+              const Text('• Your own vehicle usage'),
+              const Text('• Flexible timing'),
+              const Text('• Multiple stops allowed'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showOutstationDetails(Map<String, dynamic> outstation) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.location_on, color: AppTheme.primaryBlue),
+              const SizedBox(width: 8),
+              const Text('Outstation Trip Details'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow('From', outstation['from'] as String),
+              _buildDetailRow('To', outstation['to'] as String),
+              _buildDetailRow('Vehicle', outstation['vehicle'] as String),
+              _buildDetailRow('Driver', outstation['driver'] as String),
+              _buildDetailRow('Date & Time', outstation['date'] as String),
+              _buildDetailRow('Status', outstation['status'] as String),
+              _buildDetailRow('Total Fare', outstation['fare'] as String),
+              const SizedBox(height: 16),
+              const Text('Trip Includes:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text('• Round trip or one-way available'),
+              const Text('• Professional intercity driver'),
+              const Text('• Fuel and toll charges included'),
+              const Text('• 24/7 customer support'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
       ),
     );
   }
