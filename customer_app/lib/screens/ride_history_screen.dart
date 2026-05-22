@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'invoice_screen.dart';
 
 class RideHistoryScreen extends StatelessWidget {
   const RideHistoryScreen({super.key});
@@ -51,9 +52,11 @@ class RideHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ride History'),
-        backgroundColor: AppTheme.primaryBlue,
-        foregroundColor: Colors.white,
+        title: const Text('Ride History', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: false,
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
@@ -145,7 +148,10 @@ class RideHistoryScreen extends StatelessWidget {
                     const SizedBox(width: 16),
                     const Icon(Icons.directions_car, size: 18, color: AppTheme.textGrey),
                     const SizedBox(width: 6),
-                    Text(ride['vehicle'] as String, style: const TextStyle(fontSize: 13)),
+                    Text(ride['vehicle'] as String == 'Gora Go' ? 'Bike' : 
+                         ride['vehicle'] as String == 'Gora Sedan' ? 'Cab Economy' : 
+                         ride['vehicle'] as String == 'Gora SUV' ? 'SUV' : 'Premium', 
+                         style: const TextStyle(fontSize: 13)),
                     const Spacer(),
                     Text(ride['fare'] as String, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
                   ],
@@ -170,9 +176,23 @@ class RideHistoryScreen extends StatelessWidget {
                         ),
                       const Spacer(),
                       TextButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          final String originalVehicle = ride['vehicle'] as String;
+                          final String mappedVehicle = originalVehicle == 'Gora Go' ? 'Bike' : 
+                                                     originalVehicle == 'Gora Sedan' ? 'Cab Economy' : 
+                                                     originalVehicle == 'Gora SUV' ? 'SUV' : 'Premium';
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InvoiceScreen(
+                                vehicleName: mappedVehicle,
+                                selectedTip: 0,
+                              ),
+                            ),
+                          );
+                        },
                         icon: const Icon(Icons.receipt_long, size: 16),
-                        label: const Text('Receipt'),
+                        label: const Text('Invoice'),
                         style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
                       ),
                     ],
