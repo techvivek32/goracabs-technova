@@ -148,9 +148,14 @@ class _OtpScreenState extends State<OtpScreen> {
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          fontSize: 24, 
+          fontWeight: FontWeight.bold,
+          height: 1.0, // Ensures text doesn't have extra leading
+        ),
         decoration: InputDecoration(
           counterText: "",
+          contentPadding: EdgeInsets.zero, // Removes default padding that shifts text
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey[300]!),
@@ -159,6 +164,8 @@ class _OtpScreenState extends State<OtpScreen> {
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 2),
           ),
+          fillColor: Colors.grey[100], // Optional: light background to match UI
+          filled: true,
         ),
         onChanged: (value) {
           if (value.isNotEmpty && index < 3) {
