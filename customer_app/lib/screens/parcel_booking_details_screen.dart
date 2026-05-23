@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 
@@ -10,6 +11,7 @@ class ParcelBookingDetailsScreen extends StatelessWidget {
   final String vehicle;
   final String receiverName;
   final String receiverPhone;
+  final List<String> imagePaths;
 
   const ParcelBookingDetailsScreen({
     Key? key,
@@ -21,6 +23,7 @@ class ParcelBookingDetailsScreen extends StatelessWidget {
     required this.vehicle,
     required this.receiverName,
     required this.receiverPhone,
+    required this.imagePaths,
   }) : super(key: key);
 
   @override
@@ -97,6 +100,56 @@ class ParcelBookingDetailsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              if (imagePaths.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Parcel Images',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: imagePaths.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              width: 100,
+                              margin: const EdgeInsets.only(right: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                image: DecorationImage(
+                                  image: FileImage(File(imagePaths[index])),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

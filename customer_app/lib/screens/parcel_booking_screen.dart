@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
 import 'parcel_booking_details_screen.dart';
 
@@ -18,6 +20,9 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
   final _receiverPhoneController = TextEditingController();
   final _weightController = TextEditingController();
   
+  final List<XFile> _parcelImages = [];
+  final ImagePicker _picker = ImagePicker();
+  
   String _selectedItemType = 'Documents';
   String _selectedVehicle = 'Bike';
   
@@ -25,8 +30,8 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
   
   final List<Map<String, dynamic>> _parcelVehicles = [
     {'name': 'Bike', 'capacity': 'Up to 5 kg', 'image': 'assets/images/bike.png', 'price': '₹50'},
-    {'name': 'Scooter', 'capacity': 'Up to 10 kg', 'image': 'assets/images/topview/bike-top.png', 'price': '₹80'},
-    {'name': 'Mini Truck', 'capacity': 'Up to 500 kg', 'image': 'assets/images/texi3.png', 'price': '₹450'},
+    {'name': 'Scooter', 'capacity': 'Up to 10 kg', 'image': 'assets/images/scooter.png', 'price': '₹80'},
+    {'name': 'Mini Truck', 'capacity': 'Up to 500 kg', 'image': 'assets/images/mini-truck.png', 'price': '₹450'},
   ];
 
   @override
@@ -86,6 +91,78 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
                     ),
                     const SizedBox(height: 20),
                     _buildInputField('Weight (approx. kg)', _weightController, Icons.fitness_center, keyboardType: TextInputType.number),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Parcel Images
+              _buildSectionTitle('Parcel Images'),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Take multiple live images of the parcel', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _parcelImages.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _parcelImages.length) {
+                            return GestureDetector(
+                              onTap: _pickImage,
+                              child: Container(
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.grey[300]!),
+                                ),
+                                child: const Icon(Icons.add_a_photo, color: AppTheme.primaryBlue, size: 30),
+                              ),
+                            );
+                          }
+                          return Stack(
+                            children: [
+                              Container(
+                                width: 100,
+                                margin: const EdgeInsets.only(right: 12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  image: DecorationImage(
+                                    image: FileImage(File(_parcelImages[index].path)),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 16,
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _parcelImages.removeAt(index)),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.close, color: Colors.white, size: 14),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -296,6 +373,15 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
     );
   }
 
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      setState(() {
+        _parcelImages.add(image);
+      });
+    }
+  }
+
   void _showConfirmationPopup() {
     showModalBottomSheet(
       context: context,
@@ -322,6 +408,29 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
             _buildConfirmRow('Receiver', _receiverNameController.text.isEmpty ? 'Not set' : '${_receiverNameController.text} (${_receiverPhoneController.text})'),
             _buildConfirmRow('Item', '$_selectedItemType (${_weightController.text} kg)'),
             _buildConfirmRow('Vehicle', _selectedVehicle),
+            if (_parcelImages.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Text('Parcel Images:', style: TextStyle(color: Colors.grey, fontSize: 14)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 60,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _parcelImages.length,
+                  itemBuilder: (context, index) => Container(
+                    width: 60,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(
+                        image: FileImage(File(_parcelImages[index].path)),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             const Text('Conditions:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 8),
@@ -346,6 +455,7 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
                         vehicle: _selectedVehicle,
                         receiverName: _receiverNameController.text,
                         receiverPhone: _receiverPhoneController.text,
+                        imagePaths: _parcelImages.map((e) => e.path).toList(),
                       ),
                     ),
                   );
