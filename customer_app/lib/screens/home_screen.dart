@@ -748,7 +748,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildProfileMenuItem(Icons.account_balance_wallet_outlined, 'Wallet', () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen()));
               }),
-              _buildProfileMenuItem(Icons.history, 'Ride History', () {
+              _buildProfileMenuItem(Icons.history, 'Trip Details', () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const RideHistoryScreen()));
               }),
               _buildProfileMenuItem(Icons.card_giftcard_outlined, 'Offers & Promos', () {
