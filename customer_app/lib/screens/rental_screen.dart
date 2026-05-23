@@ -383,12 +383,11 @@ class _RentalScreenState extends State<RentalScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color(0xFF2196F3), width: 2),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF2196F3).withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
