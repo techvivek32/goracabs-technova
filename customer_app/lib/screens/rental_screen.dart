@@ -25,8 +25,8 @@ class _RentalScreenState extends State<RentalScreen> {
 
   final List<Map<String, dynamic>> _vehicles = [
     {'name': 'Economy', 'type': 'Comfortable', 'price': '₹12/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'assets/images/economy.png'},
-    {'name': 'Sedan', 'type': 'Premium', 'price': '₹15/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50), 'image': 'assets/images/texi.png'},
-    {'name': 'SUV', 'type': 'Spacious', 'price': '₹18/km', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'assets/images/texi2.png'},
+    {'name': 'SUV', 'type': 'Premium', 'price': '₹15/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50), 'image': 'assets/images/texi.png'},
+    {'name': 'Sedan', 'type': 'Spacious', 'price': '₹18/km', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'assets/images/texi2.png'},
     {'name': 'Premium', 'type': 'Luxury', 'price': '₹22/km', 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF795548), 'image': 'assets/images/texi3.png'},
   ];
 

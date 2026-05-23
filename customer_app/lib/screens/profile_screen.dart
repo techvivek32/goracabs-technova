@@ -19,10 +19,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('My Profile'),
-        backgroundColor: AppTheme.primaryBlue,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
         actions: [
           IconButton(
             onPressed: () {
@@ -36,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _isEditing = !_isEditing;
               });
             },
-            icon: Icon(_isEditing ? Icons.check : Icons.edit),
+            icon: Icon(_isEditing ? Icons.check : Icons.edit, color: AppTheme.primaryBlue),
           ),
         ],
       ),
@@ -45,13 +47,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32),
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppTheme.primaryBlue, AppTheme.primaryBlue.withAlpha(200)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -59,10 +66,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       CircleAvatar(
                         radius: 60,
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
                         child: CircleAvatar(
                           radius: 56,
-                          backgroundColor: Colors.grey[300],
+                          backgroundColor: Colors.grey[200],
                           child: const Icon(Icons.person, size: 60, color: Colors.white),
                         ),
                       ),
@@ -93,21 +100,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   Text(
                     _nameController.text,
-                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.black87, fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     _emailController.text,
-                    style: TextStyle(color: Colors.white.withAlpha(200), fontSize: 14),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildStatCard('Total Rides', '45'),
-                      Container(width: 1, height: 40, color: Colors.white.withAlpha(60)),
+                      Container(width: 1, height: 30, color: Colors.grey[200]),
                       _buildStatCard('Rating', '4.8'),
-                      Container(width: 1, height: 40, color: Colors.white.withAlpha(60)),
+                      Container(width: 1, height: 30, color: Colors.grey[200]),
                       _buildStatCard('Saved', '₹2,450'),
                     ],
                   ),
@@ -187,9 +194,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildStatCard(String label, String value) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(value, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
-        Text(label, style: TextStyle(color: Colors.white.withAlpha(200), fontSize: 12)),
+        Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
       ],
     );
   }

@@ -700,25 +700,30 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Container(
                 width: double.infinity,
+                margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(24),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppTheme.primaryBlue, AppTheme.primaryBlue],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, size: 50, color: AppTheme.primaryBlue),
+                      backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                      child: const Icon(Icons.person, size: 50, color: AppTheme.primaryBlue),
                     ),
                     const SizedBox(height: 16),
-                    const Text('John Doe', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
+                    const Text('John Doe', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 22)),
                     const SizedBox(height: 4),
-                    const Text('john.doe@goracabs.com', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    const Text('john.doe@goracabs.com', style: TextStyle(color: Colors.grey, fontSize: 14)),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
                       onPressed: () {
@@ -730,7 +735,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         backgroundColor: Colors.white,
                         foregroundColor: AppTheme.primaryBlue,
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: AppTheme.primaryBlue.withOpacity(0.2)),
+                        ),
                       ),
                     ),
                   ],
