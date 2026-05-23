@@ -10,18 +10,24 @@ class RentalScreen extends StatefulWidget {
 }
 
 class _RentalScreenState extends State<RentalScreen> {
-  String? _selectedPackage;
+  int _selectedHours = 4;
   String? _selectedVehicle;
   final _pickupController = TextEditingController();
   final _dropController = TextEditingController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
-  final List<Map<String, dynamic>> _packages = [
-    {'duration': '4 Hours', 'distance': '40 km', 'price': '₹800', 'icon': Icons.schedule, 'color': Color(0xFF2196F3)},
-    {'duration': '8 Hours', 'distance': '80 km', 'price': '₹1,500', 'icon': Icons.schedule, 'color': Color(0xFF4CAF50)},
-    {'duration': '12 Hours', 'distance': '120 km', 'price': '₹2,200', 'icon': Icons.schedule, 'color': Color(0xFFFF9800)},
-  ];
+  Map<String, dynamic> _getPackageData() {
+    int price = _selectedHours * 200; // Base price ₹200/hr
+    int distance = _selectedHours * 10; // Base distance 10km/hr
+    return {
+      'duration': '$_selectedHours Hours',
+      'distance': '$distance km',
+      'price': '₹$price',
+      'icon': Icons.schedule,
+      'color': const Color(0xFF2196F3),
+    };
+  }
 
   final List<Map<String, dynamic>> _vehicles = [
     {'name': 'Economy', 'type': 'Comfortable', 'price': '₹12/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'assets/images/economy.png'},
@@ -175,19 +181,66 @@ class _RentalScreenState extends State<RentalScreen> {
                   const SizedBox(height: 20),
                   const Text('Select Package', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(child: _buildPackageBox('4 Hours')),
-                      const SizedBox(width: 8),
-                      Expanded(child: _buildPackageBox('8 Hours')),
-                      const SizedBox(width: 8),
-                      Expanded(child: _buildPackageBox('12 Hours')),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Select Hours',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                        ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                if (_selectedHours > 1) {
+                                  setState(() => _selectedHours--);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.remove, size: 20, color: Color(0xFF2196F3)),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                '$_selectedHours',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                if (_selectedHours < 24) {
+                                  setState(() => _selectedHours++);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.add, size: 20, color: Color(0xFF2196F3)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  if (_selectedPackage != null) ...[
-                    const SizedBox(height: 16),
-                    _buildPackageDetailsCard(),
-                  ],
+                  const SizedBox(height: 16),
+                  _buildPackageDetailsCard(),
                   const SizedBox(height: 20),
                   const Text('Select Vehicle', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
@@ -257,7 +310,7 @@ class _RentalScreenState extends State<RentalScreen> {
               boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
             ),
             child: ElevatedButton(
-              onPressed: _selectedPackage == null || _selectedVehicle == null ? null : () {
+              onPressed: _selectedVehicle == null ? null : () {
                 _showBookingConfirmationDialog();
               },
               style: ElevatedButton.styleFrom(
@@ -266,8 +319,8 @@ class _RentalScreenState extends State<RentalScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: Text(
-                _selectedPackage == null || _selectedVehicle == null 
-                    ? 'Select Vehicle & Package' 
+                _selectedVehicle == null 
+                    ? 'Select Vehicle' 
                     : 'Book Package',
                 style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
               ),
@@ -322,36 +375,8 @@ class _RentalScreenState extends State<RentalScreen> {
     );
   }
 
-  Widget _buildPackageBox(String duration) {
-    final isSelected = _selectedPackage == duration;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedPackage = duration),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF2196F3) : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? Color(0xFF2196F3) : Colors.grey[300]!,
-            width: 1,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            duration,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildPackageDetailsCard() {
-    final packageData = _packages.firstWhere((p) => p['duration'] == _selectedPackage);
+    final packageData = _getPackageData();
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -398,7 +423,7 @@ class _RentalScreenState extends State<RentalScreen> {
   }
 
   void _showBookingConfirmationDialog() {
-    final packageData = _packages.firstWhere((p) => p['duration'] == _selectedPackage);
+    final packageData = _getPackageData();
     final vehicleData = _vehicles.firstWhere((v) => v['name'] == _selectedVehicle);
     
     showModalBottomSheet(
@@ -704,7 +729,7 @@ class _RentalScreenState extends State<RentalScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Your $_selectedPackage rental package has been booked successfully with $_selectedVehicle vehicle.',
+                'Your $_selectedHours hours rental package has been booked successfully with $_selectedVehicle vehicle.',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
