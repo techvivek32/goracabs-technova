@@ -12,6 +12,8 @@ import 'settings_screen.dart';
 import 'profile_screen.dart';
 import 'offers_screen.dart';
 import 'service_selection_screen.dart';
+import 'mini_ride_screen.dart';
+import 'prime_ride_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -527,6 +529,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const HireDriverScreen()));
         } else if (s['label'] == 'Parcel') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const ParcelBookingScreen()));
+        } else if (s['label'] == 'Mini Ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const MiniRideScreen()));
+        } else if (s['label'] == 'Prime Ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const PrimeRideScreen()));
         } else {
           // For new services, show a coming soon message or navigate to a placeholder
           ScaffoldMessenger.of(context).showSnackBar(
