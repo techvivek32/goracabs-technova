@@ -4,6 +4,7 @@ import 'taxi_booking_screen.dart';
 import 'outstation_screen.dart';
 import 'rental_screen.dart';
 import 'hire_driver_screen.dart';
+import 'parcel_booking_screen.dart';
 import 'wallet_screen.dart';
 import 'ride_history_screen.dart';
 import 'support_screen.dart';
@@ -524,6 +525,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const RentalScreen()));
         } else if (s['label'] == 'Hire Driver') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const HireDriverScreen()));
+        } else if (s['label'] == 'Parcel') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const ParcelBookingScreen()));
         } else {
           // For new services, show a coming soon message or navigate to a placeholder
           ScaffoldMessenger.of(context).showSnackBar(
