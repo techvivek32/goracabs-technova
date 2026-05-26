@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'taxi_booking_screen.dart';
@@ -23,8 +24,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _hasOngoingRide = true;
   int _currentIndex = 0;
+  late PageController _promoController;
+  Timer? _promoTimer;
+  int _currentPromoPage = 0;
 
   final List<Map<String, dynamic>> _services = [
     {'icon': 'assets/images/texi.png', 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
@@ -49,18 +52,41 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   final List<Map<String, String>> _promos = [
-    {'title': '50% OFF your first ride!', 'sub': 'Use code: GORA50', 'color': '0xFF0052CC'},
-    {'title': 'Free Delivery today', 'sub': 'On orders above ₹200', 'color': '0xFFE65100'},
-    {'title': 'Refer & Earn ₹100', 'sub': 'Invite friends to Gora Cabs', 'color': '0xFF2E7D32'},
+    {'title': 'Travel Safe with Gora', 'sub': 'Our drivers are vaccinated!', 'color': '0xFF0052CC', 'icon': 'security'},
+    {'title': 'Gora Prime Sedan', 'sub': 'Extra comfort at affordable prices', 'color': '0xFFE65100', 'icon': 'directions_car'},
+    {'title': 'Express Delivery', 'sub': 'Get your parcels delivered instantly', 'color': '0xFF2E7D32', 'icon': 'local_shipping'},
+    {'title': 'Weekend Gateway?', 'sub': 'Book Gora Outstation now!', 'color': '0xFF673AB7', 'icon': 'map'},
   ];
 
   @override
   void initState() {
     super.initState();
+    _promoController = PageController(initialPage: 0, viewportFraction: 0.9);
+    _startPromoTimer();
+  }
+
+  void _startPromoTimer() {
+    _promoTimer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+      if (_currentPromoPage < _promos.length - 1) {
+        _currentPromoPage++;
+      } else {
+        _currentPromoPage = 0;
+      }
+
+      if (_promoController.hasClients) {
+        _promoController.animateToPage(
+          _currentPromoPage,
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeInOutQuart,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
+    _promoTimer?.cancel();
+    _promoController.dispose();
     super.dispose();
   }
 
@@ -269,11 +295,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     
                     const SizedBox(height: 24),
-                    
-                    if (_hasOngoingRide) ...[ 
-                      _buildOngoingRide(),
-                      const SizedBox(height: 24),
-                    ],
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -298,14 +319,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 24),
 
-                    const Text('Offers for you', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Featured Ads', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 100,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
+                      height: 110,
+                      child: PageView.builder(
+                        controller: _promoController,
                         itemCount: _promos.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        onPageChanged: (int page) {
+                          setState(() {
+                            _currentPromoPage = page;
+                          });
+                        },
                         itemBuilder: (_, i) => _buildPromoBanner(_promos[i]),
                       ),
                     ),
@@ -571,74 +596,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildOngoingRide() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppTheme.primaryBlue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Image.asset(
-                'assets/images/texi2.png',
-                width: 48,
-                height: 48,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Ongoing Ride', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                SizedBox(height: 4),
-                Text('Driver is 2 min away • Gora Go', style: TextStyle(fontSize: 12, color: AppTheme.textGrey)),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryBlue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text('Track', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildPromoBanner(Map<String, String> promo) {
     final color = Color(int.parse(promo['color']!));
+    IconData adIcon = Icons.local_offer;
+    if (promo['icon'] == 'security') adIcon = Icons.security;
+    if (promo['icon'] == 'directions_car') adIcon = Icons.directions_car;
+    if (promo['icon'] == 'local_shipping') adIcon = Icons.local_shipping;
+    if (promo['icon'] == 'map') adIcon = Icons.map;
+
     return Container(
-      width: 240,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -661,12 +628,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.primaryBlue.withOpacity(0.1),
+              color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              Icons.local_offer,
-              color: AppTheme.primaryBlue,
+              adIcon,
+              color: color,
               size: 20,
             ),
           ),
