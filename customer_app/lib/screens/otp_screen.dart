@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import 'home_screen.dart';
+import 'signup_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   final bool isForgotPassword;
@@ -115,7 +115,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                     onPressed: () {
                                       Navigator.pushAndRemoveUntil(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                        MaterialPageRoute(builder: (context) => const SignupScreen()),
                                         (route) => false,
                                       );
                                     },

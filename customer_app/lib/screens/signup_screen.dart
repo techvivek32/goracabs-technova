@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
-import 'otp_screen.dart';
+import 'home_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -406,15 +406,19 @@ class _SignupScreenState extends State<SignupScreen> {
                               const SizedBox(height: 16),
 
                               SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _agreedToPolicy
-                                      ? () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OtpScreen()))
-                                      : null,
-                                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                                  child: const Text('Create Account'),
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _agreedToPolicy
+                                        ? () => Navigator.pushAndRemoveUntil(
+                                            context, 
+                                            MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                            (route) => false,
+                                          )
+                                        : null,
+                                    style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+                                    child: const Text('Create Account'),
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
