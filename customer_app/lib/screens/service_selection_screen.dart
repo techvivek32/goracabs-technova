@@ -4,6 +4,9 @@ import 'taxi_booking_screen.dart';
 import 'outstation_screen.dart';
 import 'rental_screen.dart';
 import 'hire_driver_screen.dart';
+import 'parcel_booking_screen.dart';
+import 'mini_ride_screen.dart';
+import 'prime_ride_screen.dart';
 
 class ServiceSelectionScreen extends StatelessWidget {
   const ServiceSelectionScreen({super.key});
@@ -56,6 +59,12 @@ class ServiceSelectionScreen extends StatelessWidget {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const RentalScreen()));
         } else if (service['label'] == 'Hire Driver') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const HireDriverScreen()));
+        } else if (service['label'] == 'Parcel') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const ParcelBookingScreen()));
+        } else if (service['label'] == 'Mini Ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const MiniRideScreen()));
+        } else if (service['label'] == 'Prime Ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const PrimeRideScreen()));
         }
       },
       child: Container(
