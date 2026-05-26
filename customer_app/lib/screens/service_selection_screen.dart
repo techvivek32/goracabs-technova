@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'taxi_booking_screen.dart';
+import 'bike_ride_screen.dart';
+import 'auto_ride_screen.dart';
+import 'cab_ride_screen.dart';
 import 'outstation_screen.dart';
 import 'rental_screen.dart';
 import 'hire_driver_screen.dart';
@@ -54,8 +57,12 @@ class ServiceSelectionScreen extends StatelessWidget {
   Widget _buildServiceItem(BuildContext context, Map<String, dynamic> service) {
     return GestureDetector(
       onTap: () {
-        if (service['label'] == 'Cab ride' || service['label'] == 'Bike ride' || service['label'] == 'Auto ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxiBookingScreen()));
+        if (service['label'] == 'Bike ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const BikeRideScreen()));
+        } else if (service['label'] == 'Auto ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const AutoRideScreen()));
+        } else if (service['label'] == 'Cab ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const CabRideScreen()));
         } else if (service['label'] == 'Outstation') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OutstationScreen()));
         } else if (service['label'] == 'Rentals') {

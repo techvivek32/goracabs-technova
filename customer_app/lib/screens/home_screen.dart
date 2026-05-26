@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'taxi_booking_screen.dart';
+import 'bike_ride_screen.dart';
+import 'auto_ride_screen.dart';
+import 'cab_ride_screen.dart';
 import 'outstation_screen.dart';
 import 'rental_screen.dart';
 import 'hire_driver_screen.dart';
@@ -544,8 +547,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildServiceItem(Map<String, dynamic> s) {
     return GestureDetector(
       onTap: () {
-        if (s['label'] == 'Cab ride' || s['label'] == 'Bike ride' || s['label'] == 'Auto ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxiBookingScreen()));
+        if (s['label'] == 'Bike ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const BikeRideScreen()));
+        } else if (s['label'] == 'Auto ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const AutoRideScreen()));
+        } else if (s['label'] == 'Cab ride') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const CabRideScreen()));
         } else if (s['label'] == 'Outstation') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OutstationScreen()));
         } else if (s['label'] == 'Rentals') {

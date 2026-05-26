@@ -18,7 +18,12 @@ class _RentalScreenState extends State<RentalScreen> {
   TimeOfDay? _selectedTime;
 
   Map<String, dynamic> _getPackageData() {
-    int price = _selectedHours * 200; // Base price ₹200/hr
+    int basePricePerHour = 200;
+    if (_selectedVehicle != null) {
+      final v = _vehicles.firstWhere((element) => element['name'] == _selectedVehicle);
+      basePricePerHour = v['pricePerHour'];
+    }
+    int price = _selectedHours * basePricePerHour;
     int distance = _selectedHours * 10; // Base distance 10km/hr
     return {
       'duration': '$_selectedHours Hours',
@@ -30,10 +35,10 @@ class _RentalScreenState extends State<RentalScreen> {
   }
 
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Economy', 'type': 'Comfortable', 'price': '₹12/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'assets/images/economy.png'},
-    {'name': 'SUV', 'type': 'Premium', 'price': '₹15/km', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50), 'image': 'assets/images/texi.png'},
-    {'name': 'Sedan', 'type': 'Spacious', 'price': '₹18/km', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'assets/images/texi2.png'},
-    {'name': 'Premium', 'type': 'Luxury', 'price': '₹22/km', 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF795548), 'image': 'assets/images/texi3.png'},
+    {'name': 'Economy', 'type': 'Comfortable', 'pricePerHour': 200, 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'assets/images/economy.png'},
+    {'name': 'SUV', 'type': 'Premium', 'pricePerHour': 250, 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50), 'image': 'assets/images/texi.png'},
+    {'name': 'Sedan', 'type': 'Spacious', 'pricePerHour': 300, 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'assets/images/texi2.png'},
+    {'name': 'Premium', 'type': 'Luxury', 'pricePerHour': 400, 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF795548), 'image': 'assets/images/texi3.png'},
   ];
 
   @override
@@ -239,21 +244,14 @@ class _RentalScreenState extends State<RentalScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildPackageDetailsCard(),
                   const SizedBox(height: 20),
                   const Text('Select Vehicle', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
-                  GridView.builder(
+                  ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 2.5,
-                    ),
                     itemCount: _vehicles.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) => _buildVehicleCard(_vehicles[index]),
                   ),
                   const SizedBox(height: 16),
@@ -293,9 +291,9 @@ class _RentalScreenState extends State<RentalScreen> {
                         const SizedBox(height: 4),
                         Text('• Fixed pricing, no surge', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
                         const SizedBox(height: 4),
-                        Text('• Extra km charged at ₹12/km', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                        Text('• Extra km charges apply beyond limit', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
                         const SizedBox(height: 4),
-                        Text('• Extra hour charged at ₹150/hr', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                        Text('• Extra hour charges apply beyond limit', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
                       ],
                     ),
                   ),
@@ -333,90 +331,84 @@ class _RentalScreenState extends State<RentalScreen> {
 
   Widget _buildVehicleCard(Map<String, dynamic> v) {
     final isSelected = _selectedVehicle == v['name'];
+    final totalPrice = v['pricePerHour'] * _selectedHours;
+    final totalDistance = _selectedHours * 10;
     return GestureDetector(
       onTap: () => setState(() => _selectedVehicle = v['name']),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? (v['color'] as Color) : Colors.grey[300]!, 
+            color: isSelected ? (v['color'] as Color) : Colors.grey[200]!, 
             width: isSelected ? 2 : 1
           ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: (v['color'] as Color).withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            )
+          ] : [],
         ),
         child: Row(
           children: [
             Container(
-              width: 80,
-              height: 55,
+              width: 90,
+              height: 60,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
                   v['image'],
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
-                    return Icon(v['icon'], color: v['color'] as Color, size: 36);
+                    return Icon(v['icon'], color: v['color'] as Color, size: 40);
                   },
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                v['name'], 
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                textAlign: TextAlign.left,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    v['name'], 
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Text(
+                        v['type'], 
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '• Up to $totalDistance km',
+                        style: TextStyle(fontSize: 12, color: Colors.blue[700], fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
               ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '₹$totalPrice',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF2196F3)),
+                ),
+                Text(
+                  '₹${v['pricePerHour']}/hr',
+                  style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPackageDetailsCard() {
-    final packageData = _getPackageData();
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: (packageData['color'] as Color).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: (packageData['color'] as Color).withOpacity(0.3),
-              ),
-            ),
-            child: Icon(packageData['icon'], color: packageData['color'] as Color, size: 28),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(packageData['duration'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                const SizedBox(height: 2),
-                Text('Up to ${packageData['distance']}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-              ],
-            ),
-          ),
-          Text(packageData['price'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2196F3))),
-        ],
       ),
     );
   }
@@ -620,7 +612,7 @@ class _RentalScreenState extends State<RentalScreen> {
                       _buildConditionItem(
                         Icons.schedule,
                         'Extra time charges',
-                        'Additional ₹150/hour beyond package duration',
+                        'Additional charges beyond package duration apply',
                       ),
                     ],
                   ),
