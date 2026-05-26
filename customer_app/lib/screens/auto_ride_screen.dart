@@ -56,7 +56,8 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
   ];
 
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Auto', 'type': 'Affordable', 'price': '₹76', 'eta': '3 min', 'capacity': '3', 'icon': Icons.electric_rickshaw, 'color': Color(0xFF2196F3), 'image': 'assets/images/auto.jpg'},
+    {'name': 'Auto', 'type': 'Affordable', 'price': '₹76', 'eta': '3 min', 'capacity': '3', 'icon': Icons.electric_rickshaw, 'color': Color(0xFF2196F3), 'image': 'assets/images/auto.jpg', 'topImage': 'assets/images/topview/auto-top.png'},
+    {'name': 'EV Auto', 'type': 'Eco-Friendly', 'price': '₹85', 'eta': '4 min', 'capacity': '3', 'icon': Icons.electric_car, 'color': Color(0xFF4CAF50), 'image': 'assets/images/ev-auto.png', 'topImage': 'assets/images/topview/ev-auto-top.png'},
   ];
 
   @override
@@ -227,6 +228,8 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
                             final location = entry.value;
                             final rotationAngle = (index * 72.0) * (3.14159 / 180);
                             
+                            final selectedVehicleData = _vehicles.firstWhere((v) => v['name'] == _selectedVehicle);
+                            
                             return Marker(
                               point: location,
                               width: 50,
@@ -234,7 +237,7 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
                               child: Transform.rotate(
                                 angle: rotationAngle,
                                 child: Image.asset(
-                                  'assets/images/topview/auto-top.png',
+                                  selectedVehicleData['topImage'],
                                   width: 50,
                                   height: 50,
                                   fit: BoxFit.contain,
@@ -243,10 +246,10 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
                                       width: 50,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        color: Color(0xFF2196F3),
+                                        color: selectedVehicleData['color'] as Color,
                                         borderRadius: BorderRadius.circular(25),
                                       ),
-                                      child: const Icon(Icons.electric_rickshaw, color: Colors.white, size: 24),
+                                      child: Icon(selectedVehicleData['icon'], color: Colors.white, size: 24),
                                     );
                                   },
                                 ),
@@ -259,7 +262,7 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
                             width: 60,
                             height: 60,
                             child: Image.asset(
-                              'assets/images/topview/auto-top.png',
+                              _vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['topImage'],
                               width: 60,
                               height: 60,
                               fit: BoxFit.contain,
@@ -269,7 +272,7 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
                                   shape: BoxShape.circle,
                                   border: Border.all(color: Colors.white, width: 2),
                                 ),
-                                child: const Icon(Icons.electric_rickshaw, color: Colors.white, size: 30),
+                                child: Icon(_vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['icon'], color: Colors.white, size: 30),
                               ),
                             ),
                           ),
@@ -624,15 +627,15 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.access_time_filled, color: Color(0xFF2196F3), size: 18),
-                  SizedBox(width: 8),
-                  Text('Arriving in 3 mins', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
-                  SizedBox(width: 12),
-                  Icon(Icons.location_on, color: Colors.green, size: 18),
-                  SizedBox(width: 8),
-                  Text('1.0 km away', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
+                  const Icon(Icons.access_time_filled, color: Color(0xFF2196F3), size: 18),
+                  const SizedBox(width: 8),
+                  Text('Arriving in ${_vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['eta']}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.location_on, color: Colors.green, size: 18),
+                  const SizedBox(width: 8),
+                  const Text('1.0 km away', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
                 ],
               ),
               const SizedBox(height: 16),
@@ -643,8 +646,8 @@ class _AutoRideScreenState extends State<AutoRideScreen> {
                   children: [
                     Container(width: 55, height: 55, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey[200]!, width: 2), image: const DecorationImage(image: NetworkImage('https://i.pravatar.cc/150?u=autopilot'), fit: BoxFit.cover))),
                     const SizedBox(width: 12),
-                    const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Mahendra Kumar', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)), SizedBox(height: 4), Row(children: [Icon(Icons.star, color: Colors.amber, size: 16), SizedBox(width: 4), Text('4.9 (1.5k+ rides)', style: TextStyle(fontSize: 13, color: Colors.grey))]), SizedBox(height: 4), Text('Bajaj RE • RJ 14 AB 1234', style: TextStyle(fontSize: 11, color: Colors.grey))])),
-                    SizedBox(width: 70, height: 50, child: Image.asset('assets/images/auto.jpg', fit: BoxFit.contain)),
+                    const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Mahendra Kumar', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)), SizedBox(height: 4), Row(children: [Icon(Icons.star, color: Colors.amber, size: 16), SizedBox(width: 4), Text('4.9 (1.5k+ rides)', style: TextStyle(fontSize: 13, color: Colors.grey))]), SizedBox(height: 4), Text('Pilot • RJ 14 AB 1234', style: TextStyle(fontSize: 11, color: Colors.grey))])),
+                    SizedBox(width: 70, height: 50, child: Image.asset(_vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['image'], fit: BoxFit.contain)),
                   ],
                 ),
               ),

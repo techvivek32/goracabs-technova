@@ -57,7 +57,9 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
   ];
 
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Bike', 'type': 'Quick Rides', 'price': '₹49', 'eta': '2 min', 'capacity': '1', 'icon': Icons.two_wheeler, 'color': Color(0xFF2196F3), 'image': 'assets/images/bike.png'},
+    {'name': 'Bike', 'type': 'Quick Rides', 'price': '₹49', 'eta': '2 min', 'capacity': '1', 'icon': Icons.two_wheeler, 'color': Color(0xFF2196F3), 'image': 'assets/images/bike.png', 'topImage': 'assets/images/topview/bike-top.png'},
+    {'name': 'Scooter', 'type': 'Electric', 'price': '₹39', 'eta': '3 min', 'capacity': '1', 'icon': Icons.motorcycle, 'color': Color(0xFF4CAF50), 'image': 'assets/images/scooter.png', 'topImage': 'assets/images/topview/scooter-top.png'},
+    {'name': 'Ola', 'type': 'Premium EV', 'price': '₹59', 'eta': '4 min', 'capacity': '1', 'icon': Icons.electric_bike, 'color': Color(0xFF2196F3), 'image': 'assets/images/ola.png', 'topImage': 'assets/images/topview/ola-top.png'},
   ];
 
   @override
@@ -228,6 +230,8 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
                             final location = entry.value;
                             final rotationAngle = (index * 60.0) * (3.14159 / 180);
                             
+                            final selectedVehicleData = _vehicles.firstWhere((v) => v['name'] == _selectedVehicle);
+                            
                             return Marker(
                               point: location,
                               width: 50,
@@ -235,7 +239,7 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
                               child: Transform.rotate(
                                 angle: rotationAngle,
                                 child: Image.asset(
-                                  'assets/images/topview/bike-top.png',
+                                  selectedVehicleData['topImage'],
                                   width: 50,
                                   height: 50,
                                   fit: BoxFit.contain,
@@ -244,10 +248,10 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
                                       width: 50,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        color: Color(0xFFFF9800),
+                                        color: selectedVehicleData['color'] as Color,
                                         borderRadius: BorderRadius.circular(25),
                                       ),
-                                      child: const Icon(Icons.two_wheeler, color: Colors.white, size: 24),
+                                      child: Icon(selectedVehicleData['icon'], color: Colors.white, size: 24),
                                     );
                                   },
                                 ),
@@ -260,7 +264,7 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
                             width: 60,
                             height: 60,
                             child: Image.asset(
-                              'assets/images/topview/bike-top.png',
+                              _vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['topImage'],
                               width: 60,
                               height: 60,
                               fit: BoxFit.contain,
@@ -270,7 +274,7 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
                                   shape: BoxShape.circle,
                                   border: Border.all(color: Colors.white, width: 2),
                                 ),
-                                child: const Icon(Icons.two_wheeler, color: Colors.white, size: 30),
+                                child: Icon(_vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['icon'], color: Colors.white, size: 30),
                               ),
                             ),
                           ),
@@ -625,15 +629,15 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.access_time_filled, color: Color(0xFF2196F3), size: 18),
-                  SizedBox(width: 8),
-                  Text('Arriving in 2 mins', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
-                  SizedBox(width: 12),
-                  Icon(Icons.location_on, color: Colors.green, size: 18),
-                  SizedBox(width: 8),
-                  Text('0.8 km away', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
+                  const Icon(Icons.access_time_filled, color: Color(0xFF2196F3), size: 18),
+                  const SizedBox(width: 8),
+                  Text('Arriving in ${_vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['eta']}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.location_on, color: Colors.green, size: 18),
+                  const SizedBox(width: 8),
+                  const Text('0.8 km away', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
                 ],
               ),
               const SizedBox(height: 16),
@@ -644,8 +648,8 @@ class _BikeRideScreenState extends State<BikeRideScreen> {
                   children: [
                     Container(width: 55, height: 55, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey[200]!, width: 2), image: const DecorationImage(image: NetworkImage('https://i.pravatar.cc/150?u=bikepilot'), fit: BoxFit.cover))),
                     const SizedBox(width: 12),
-                    const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Arjun Singh', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)), SizedBox(height: 4), Row(children: [Icon(Icons.star, color: Colors.amber, size: 16), SizedBox(width: 4), Text('4.8 (800+ rides)', style: TextStyle(fontSize: 13, color: Colors.grey))]), SizedBox(height: 4), Text('Hero Splendor • RJ 14 AB 5678', style: TextStyle(fontSize: 11, color: Colors.grey))])),
-                    SizedBox(width: 70, height: 50, child: Image.asset('assets/images/bike.png', fit: BoxFit.contain)),
+                    const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Arjun Singh', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)), SizedBox(height: 4), Row(children: [Icon(Icons.star, color: Colors.amber, size: 16), SizedBox(width: 4), Text('4.8 (800+ rides)', style: TextStyle(fontSize: 13, color: Colors.grey))]), SizedBox(height: 4), Text('Pilot • RJ 14 AB 5678', style: TextStyle(fontSize: 11, color: Colors.grey))])),
+                    SizedBox(width: 70, height: 50, child: Image.asset(_vehicles.firstWhere((v) => v['name'] == _selectedVehicle)['image'], fit: BoxFit.contain)),
                   ],
                 ),
               ),

@@ -226,7 +226,7 @@ class _RentalScreenState extends State<RentalScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                if (_selectedHours < 24) {
+                                if (_selectedHours < 12) {
                                   setState(() => _selectedHours++);
                                 }
                               },

@@ -9,6 +9,7 @@ import 'outstation_screen.dart';
 import 'rental_screen.dart';
 import 'hire_driver_screen.dart';
 import 'parcel_booking_screen.dart';
+import 'inquiry_screen.dart';
 import 'wallet_screen.dart';
 import 'ride_history_screen.dart';
 import 'support_screen.dart';
@@ -562,7 +563,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else if (s['label'] == 'Parcel') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const ParcelBookingScreen()));
         } else if (s['label'] == 'Any inquiry') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const InquiryScreen()));
         } else {
           // For new services, show a coming soon message or navigate to a placeholder
           ScaffoldMessenger.of(context).showSnackBar(

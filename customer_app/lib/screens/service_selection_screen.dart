@@ -10,6 +10,7 @@ import 'hire_driver_screen.dart';
 import 'parcel_booking_screen.dart';
 import 'mini_ride_screen.dart';
 import 'prime_ride_screen.dart';
+import 'inquiry_screen.dart';
 import 'support_screen.dart';
 
 class ServiceSelectionScreen extends StatelessWidget {
@@ -76,7 +77,7 @@ class ServiceSelectionScreen extends StatelessWidget {
         } else if (service['label'] == 'Prime Ride') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const PrimeRideScreen()));
         } else if (service['label'] == 'Any inquiry') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const InquiryScreen()));
         }
       },
       child: Container(
