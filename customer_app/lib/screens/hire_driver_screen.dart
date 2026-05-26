@@ -11,19 +11,21 @@ class HireDriverScreen extends StatefulWidget {
 
 class _HireDriverScreenState extends State<HireDriverScreen> {
   String _hireDuration = 'Hourly';
+  String _tripType = 'One Way';
+  String _transmissionType = 'Manual';
   String? _selectedVehicle;
   final _pickupController = TextEditingController();
   final _dropController = TextEditingController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
+  DateTime? _returnDate;
+  TimeOfDay? _returnTime;
   int _selectedHours = 4;
   int _selectedDays = 1;
 
   final List<Map<String, dynamic>> _vehicles = [
-    {'name': 'Economy', 'type': 'Comfortable', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF2196F3), 'image': 'assets/images/economy.png'},
-    {'name': 'SUV', 'type': 'Premium', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF4CAF50), 'image': 'assets/images/texi.png'},
-    {'name': 'Sedan', 'type': 'Spacious', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF9C27B0), 'image': 'assets/images/texi2.png'},
-    {'name': 'Premium', 'type': 'Luxury', 'capacity': '4', 'icon': Icons.car_rental, 'color': Color(0xFF795548), 'image': 'assets/images/texi3.png'},
+    {'name': 'Sedan', 'type': 'Spacious', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF9C27B0), 'image': 'assets/images/texi2.png'},
+    {'name': 'SUV', 'type': 'Premium', 'capacity': '6', 'icon': Icons.airport_shuttle, 'color': Color(0xFF4CAF50), 'image': 'assets/images/texi.png'},
   ];
 
   @override
@@ -43,224 +45,164 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
         ),
       ),
       body: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Trip Type Selection
+                  const Text('Trip Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(child: _buildSelectButton('One Way', _tripType, (val) => setState(() => _tripType = val))),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildSelectButton('Round Trip', _tripType, (val) => setState(() => _tripType = val))),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.radio_button_checked, color: Color(0xFF4CAF50), size: 18),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 40,
-                                      child: TextField(
-                                        controller: _pickupController,
-                                        decoration: InputDecoration(
-                                          hintText: 'Enter pickup location',
-                                          border: InputBorder.none,
-                                          isDense: true,
-                                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                                          hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
-                                        ),
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 9, top: 8, bottom: 8),
-                                child: Row(
-                                  children: [
-                                    Column(
-                                      children: List.generate(3, (index) => Container(
-                                        margin: const EdgeInsets.symmetric(vertical: 1),
-                                        width: 2,
-                                        height: 3,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[400],
-                                          borderRadius: BorderRadius.circular(1),
-                                        ),
-                                      )),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(Icons.location_on, color: Color(0xFFFF5252), size: 18),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 40,
-                                      child: TextField(
-                                        controller: _dropController,
-                                        decoration: InputDecoration(
-                                          hintText: 'Enter drop location',
-                                          border: InputBorder.none,
-                                          isDense: true,
-                                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                                          hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
-                                        ),
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text('Select Date & Time', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: () async {
-                                  final date = await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                                  );
-                                  if (date != null) {
-                                    setState(() => _selectedDate = date);
-                                  }
-                                },
-                                icon: const Icon(Icons.calendar_today, size: 18),
-                                label: Text(_selectedDate == null 
-                                  ? 'Select Date' 
-                                  : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'),
-                                style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: () async {
-                                  final time = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                  );
-                                  if (time != null) {
-                                    setState(() => _selectedTime = time);
-                                  }
-                                },
-                                icon: const Icon(Icons.access_time, size: 18),
-                                label: Text(_selectedTime == null 
-                                  ? 'Select Time' 
-                                  : _selectedTime!.format(context)),
-                                style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        const Text('Hire Mode', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(child: _buildHireModeButton('Hourly')),
-                            const SizedBox(width: 12),
-                            Expanded(child: _buildHireModeButton('Daily')),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Text('Select ${_hireDuration == 'Hourly' ? 'Hours' : 'Days'}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 12),
-                        _buildDurationSelector(),
-                        const SizedBox(height: 12),
-                        _buildPriceDisplay(),
-                        const SizedBox(height: 20),
-                        const Text('Select Your Vehicle Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 12),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 2.5,
-                          ),
-                          itemCount: _vehicles.length,
-                          itemBuilder: (context, index) => _buildVehicleCard(_vehicles[index]),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text('Trip Conditions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
-                          ),
-                          child: Column(
-                            children: [
-                              _buildConditionItem(Icons.person, 'Verified professional driver'),
-                              const SizedBox(height: 8),
-                              _buildConditionItem(Icons.toll, 'Tolls & parking extra (pay directly)'),
-                              const SizedBox(height: 8),
-                              _buildConditionItem(Icons.schedule, 'Overtime: ₹150/hour extra'),
-                              const SizedBox(height: 8),
-                              _buildConditionItem(Icons.info_outline, 'Driver will drive your own car'),
-                            ],
-                          ),
-                        ),
+                        _buildLocationRow(Icons.radio_button_checked, const Color(0xFF4CAF50), _pickupController, 'Enter pickup location'),
+                        _buildDivider(),
+                        _buildLocationRow(Icons.location_on, const Color(0xFFFF5252), _dropController, 'Enter drop location'),
                       ],
                     ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
+                  const SizedBox(height: 20),
+
+                  const Text('Schedule', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 12),
+                  _buildDateTimePicker(
+                    'Pickup',
+                    _selectedDate,
+                    _selectedTime,
+                    (d) => setState(() => _selectedDate = d),
+                    (t) => setState(() => _selectedTime = t),
                   ),
-                  child: ElevatedButton(
-                    onPressed: _selectedVehicle == null ? null : () {
-                      _showBookingConfirmationDialog();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2196F3),
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  
+                  if (_tripType == 'Round Trip') ...[
+                    const SizedBox(height: 12),
+                    _buildDateTimePicker(
+                      'Return',
+                      _returnDate,
+                      _returnTime,
+                      (d) => setState(() => _returnDate = d),
+                      (t) => setState(() => _returnTime = t),
                     ),
-                    child: Text(
-                      _selectedVehicle == null 
-                          ? 'Complete Selection' 
-                          : 'Confirm Hire Driver',
-                      style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+                  ],
+
+                  const SizedBox(height: 20),
+                  const Text('Hire Mode', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(child: _buildSelectButton('Hourly', _hireDuration, (val) => setState(() => _hireDuration = val))),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildSelectButton('Daily', _hireDuration, (val) => setState(() => _hireDuration = val))),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text('Select ${_hireDuration == 'Hourly' ? 'Hours' : 'Days'}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  _buildDurationSelector(),
+                  const SizedBox(height: 12),
+                  _buildPriceDisplay(),
+                  const SizedBox(height: 20),
+
+                  const Text('Car Transmission', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(child: _buildSelectButton('Manual', _transmissionType, (val) => setState(() => _transmissionType = val))),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildSelectButton('Automatic', _transmissionType, (val) => setState(() => _transmissionType = val))),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+                  const Text('Select Your Vehicle Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 2.5,
+                    ),
+                    itemCount: _vehicles.length,
+                    itemBuilder: (context, index) => _buildVehicleCard(_vehicles[index]),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text('Trip Conditions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildConditionItem(Icons.person, 'Verified professional driver'),
+                        const SizedBox(height: 8),
+                        _buildConditionItem(Icons.toll, 'Tolls & parking extra (pay directly)'),
+                        const SizedBox(height: 8),
+                        _buildConditionItem(Icons.schedule, 'Overtime: ₹150/hour extra'),
+                        const SizedBox(height: 8),
+                        _buildConditionItem(Icons.info_outline, 'Driver will drive your own car'),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
+            ),
+            child: ElevatedButton(
+              onPressed: _selectedVehicle == null ? null : () {
+                _showBookingConfirmationDialog();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2196F3),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(
+                _selectedVehicle == null 
+                    ? 'Complete Selection' 
+                    : 'Confirm Hire Driver',
+                style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildHireModeButton(String mode) {
-    final isSelected = _hireDuration == mode;
+  Widget _buildSelectButton(String label, String groupValue, Function(String) onChanged) {
+    final isSelected = groupValue == label;
     return GestureDetector(
-      onTap: () => setState(() {
-        _hireDuration = mode;
-      }),
+      onTap: () => onChanged(label),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
@@ -270,13 +212,91 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
         ),
         child: Center(
           child: Text(
-            mode,
+            label,
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.black87,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDateTimePicker(String label, DateTime? date, TimeOfDay? time, Function(DateTime) onDate, Function(TimeOfDay) onTime) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () async {
+              final d = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+              );
+              if (d != null) onDate(d);
+            },
+            icon: const Icon(Icons.calendar_today, size: 18),
+            label: Text(date == null ? '$label Date' : '${date.day}/${date.month}/${date.year}'),
+            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () async {
+              final t = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+              if (t != null) onTime(t);
+            },
+            icon: const Icon(Icons.access_time, size: 18),
+            label: Text(time == null ? '$label Time' : time.format(context)),
+            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationRow(IconData icon, Color color, TextEditingController controller, String hint) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 18),
+        const SizedBox(width: 12),
+        Expanded(
+          child: SizedBox(
+            height: 40,
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: hint,
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+              ),
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDivider() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 9, top: 4, bottom: 4),
+      child: Row(
+        children: [
+          Column(
+            children: List.generate(2, (index) => Container(
+              margin: const EdgeInsets.symmetric(vertical: 1),
+              width: 2,
+              height: 3,
+              decoration: BoxDecoration(color: Colors.grey[400], borderRadius: BorderRadius.circular(1)),
+            )),
+          ),
+        ],
       ),
     );
   }
@@ -292,34 +312,22 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '$_hireDuration Selection',
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-          ),
+          Text('$_hireDuration Selection', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
           Row(
             children: [
               _buildRoundButton(Icons.remove, () {
                 setState(() {
-                  if (_hireDuration == 'Hourly') {
-                    if (_selectedHours > 1) _selectedHours--;
-                  } else {
-                    if (_selectedDays > 1) _selectedDays--;
-                  }
+                  if (_hireDuration == 'Hourly') { if (_selectedHours > 1) _selectedHours--; }
+                  else { if (_selectedDays > 1) _selectedDays--; }
                 });
               }),
               const SizedBox(width: 20),
-              Text(
-                _hireDuration == 'Hourly' ? '$_selectedHours hr' : '$_selectedDays day',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              Text(_hireDuration == 'Hourly' ? '$_selectedHours hr' : '$_selectedDays day', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(width: 20),
               _buildRoundButton(Icons.add, () {
                 setState(() {
-                  if (_hireDuration == 'Hourly') {
-                    if (_selectedHours < 24) _selectedHours++;
-                  } else {
-                    if (_selectedDays < 30) _selectedDays++;
-                  }
+                  if (_hireDuration == 'Hourly') { if (_selectedHours < 24) _selectedHours++; }
+                  else { if (_selectedDays < 30) _selectedDays++; }
                 });
               }),
             ],
@@ -344,21 +352,12 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Estimated Price',
-                style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
-              ),
+              const Text('Estimated Price', style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500)),
               const SizedBox(height: 4),
-              Text(
-                _hireDuration == 'Hourly' ? '₹150/hour' : '₹1500/day',
-                style: TextStyle(fontSize: 12, color: Colors.blue[700], fontWeight: FontWeight.w600),
-              ),
+              Text(_hireDuration == 'Hourly' ? '₹150/hour' : '₹1500/day', style: TextStyle(fontSize: 12, color: Colors.blue[700], fontWeight: FontWeight.w600)),
             ],
           ),
-          Text(
-            '₹$price',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2196F3)),
-          ),
+          Text('₹$price', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2196F3))),
         ],
       ),
     );
@@ -373,9 +372,7 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
           color: Colors.white,
           shape: BoxShape.circle,
           border: Border.all(color: Colors.grey[300]!),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 4, offset: const Offset(0, 2)),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 4, offset: const Offset(0, 2))],
         ),
         child: Icon(icon, size: 20, color: const Color(0xFF2196F3)),
       ),
@@ -391,32 +388,13 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? (v['color'] as Color) : Colors.grey[300]!, 
-            width: isSelected ? 2 : 1
-          ),
+          border: Border.all(color: isSelected ? (v['color'] as Color) : Colors.grey[300]!, width: isSelected ? 2 : 1),
         ),
         child: Row(
           children: [
-            SizedBox(
-              width: 60,
-              height: 45,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.asset(
-                  v['image'],
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => Icon(v['icon'], color: v['color'] as Color, size: 24),
-                ),
-              ),
-            ),
+            SizedBox(width: 60, height: 45, child: Image.asset(v['image'], fit: BoxFit.contain, errorBuilder: (context, error, stackTrace) => Icon(v['icon'], color: v['color'] as Color, size: 24))),
             const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                v['name'], 
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-              ),
-            ),
+            Expanded(child: Text(v['name'], style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13))),
           ],
         ),
       ),
@@ -451,15 +429,7 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
           ),
           child: Column(
             children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              Container(margin: const EdgeInsets.symmetric(vertical: 12), width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -473,48 +443,21 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                             children: [
                               Text('Confirm Hire', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                               SizedBox(height: 8),
-                              Text(
-                                'Professional verified drivers for your personal vehicle',
-                                style: TextStyle(fontSize: 14, color: Colors.grey, height: 1.4),
-                              ),
+                              Text('Professional verified drivers for your personal vehicle', style: TextStyle(fontSize: 14, color: Colors.grey, height: 1.4)),
                             ],
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Image.asset(
-                          selectedVehicleData['image'],
-                          width: 100,
-                          height: 80,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 60, color: Color(0xFF2196F3)),
-                        ),
+                        Image.asset(selectedVehicleData['image'], width: 100, height: 80, fit: BoxFit.contain, errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 60, color: Color(0xFF2196F3))),
                       ],
                     ),
                     const SizedBox(height: 24),
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Column(
-                          children: [
-                            Icon(Icons.verified_user, color: Colors.grey, size: 28),
-                            SizedBox(height: 4),
-                            Text('Verified Pro', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Icon(Icons.security, color: Colors.grey, size: 28),
-                            SizedBox(height: 4),
-                            Text('Safe Ride', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Icon(Icons.timer, color: Colors.grey, size: 28),
-                            SizedBox(height: 4),
-                            Text('Punctual', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          ],
-                        ),
+                        _FeatureIcon(icon: Icons.verified_user, label: 'Verified Pro'),
+                        _FeatureIcon(icon: Icons.security, label: 'Safe Ride'),
+                        _FeatureIcon(icon: Icons.timer, label: 'Punctual'),
                       ],
                     ),
                     const SizedBox(height: 32),
@@ -522,21 +465,20 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[200]!),
-                      ),
+                      decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey[200]!)),
                       child: Column(
                         children: [
-                          _buildMinimalConfirmRow(Icons.radio_button_checked, Color(0xFF4CAF50), 'Pickup', _pickupController.text.isEmpty ? 'Current Location' : _pickupController.text),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Align(alignment: Alignment.centerLeft, child: SizedBox(height: 10, child: VerticalDivider(width: 2))),
-                          ),
-                          _buildMinimalConfirmRow(Icons.calendar_today, Color(0xFF2196F3), 'Schedule', '${_selectedDate == null ? 'Today' : '${_selectedDate!.day}/${_selectedDate!.month}'} at ${_selectedTime == null ? 'Now' : _selectedTime!.format(context)}'),
-                          const Divider(height: 32),
-                          _buildMinimalConfirmRow(Icons.timer_outlined, Colors.grey, 'Duration', duration),
+                          _buildMinimalConfirmRow(Icons.alt_route, const Color(0xFF2196F3), 'Trip Type', _tripType),
+                          const Divider(height: 24),
+                          _buildMinimalConfirmRow(Icons.radio_button_checked, const Color(0xFF4CAF50), 'Pickup', _pickupController.text.isEmpty ? 'Current Location' : _pickupController.text),
+                          const Padding(padding: EdgeInsets.only(left: 10), child: Align(alignment: Alignment.centerLeft, child: SizedBox(height: 10, child: VerticalDivider(width: 2)))),
+                          _buildMinimalConfirmRow(Icons.calendar_today, const Color(0xFF2196F3), 'Start', '${_selectedDate == null ? 'Today' : '${_selectedDate!.day}/${_selectedDate!.month}'} at ${_selectedTime == null ? 'Now' : _selectedTime!.format(context)}'),
+                          if (_tripType == 'Round Trip') ...[
+                            const Padding(padding: EdgeInsets.only(left: 10), child: Align(alignment: Alignment.centerLeft, child: SizedBox(height: 10, child: VerticalDivider(width: 2)))),
+                            _buildMinimalConfirmRow(Icons.history, Colors.orange, 'Return', '${_returnDate == null ? 'Not set' : '${_returnDate!.day}/${_returnDate!.month}'} at ${_returnTime == null ? 'Not set' : _returnTime!.format(context)}'),
+                          ],
+                          const Divider(height: 24),
+                          _buildMinimalConfirmRow(Icons.settings, Colors.grey, 'Transmission', _transmissionType),
                           const SizedBox(height: 12),
                           _buildMinimalConfirmRow(Icons.directions_car_outlined, Colors.grey, 'Car Type', _selectedVehicle!),
                         ],
@@ -545,11 +487,7 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                     const SizedBox(height: 32),
                     Container(
                       padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2196F3).withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.1)),
-                      ),
+                      decoration: BoxDecoration(color: const Color(0xFF2196F3).withOpacity(0.05), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.1))),
                       child: Column(
                         children: [
                           Row(
@@ -561,13 +499,8 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                           ),
                           const Divider(height: 32),
                           _buildFareRow('Base Driver Fee', '₹$basePrice'),
-                          const SizedBox(height: 8),
-                          _buildFareRow('Convenience Fee', '₹0'),
                           const SizedBox(height: 16),
-                          const Text(
-                            'Tolls, parking and fuel are to be provided by the customer. Overtime charges of ₹150/hr apply after the package duration.',
-                            style: TextStyle(fontSize: 11, color: Colors.grey, height: 1.4),
-                          ),
+                          const Text('Tolls, parking and fuel are to be provided by the customer. Overtime charges apply after the package duration.', style: TextStyle(fontSize: 11, color: Colors.grey, height: 1.4)),
                         ],
                       ),
                     ),
@@ -576,20 +509,16 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
               ),
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, -5))],
-                ),
+                decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, -5))]),
                 child: SafeArea(
                   top: false,
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                    onPressed: () {
+                      onPressed: () {
                         Navigator.pop(context);
                         final duration = _hireDuration == 'Hourly' ? '$_selectedHours Hours' : '$_selectedDays Day(s)';
                         final basePrice = _hireDuration == 'Hourly' ? _selectedHours * 150 : _selectedDays * 1500;
-                        
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -597,7 +526,7 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                               inquiryId: 'HD${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
                               pickupLocation: _pickupController.text.isEmpty ? 'Current Location' : _pickupController.text,
                               dropLocation: _dropController.text.isEmpty ? 'Not Specified' : _dropController.text,
-                              carType: _selectedVehicle!,
+                              carType: '$_selectedVehicle ($_transmissionType)',
                               hireDuration: _hireDuration,
                               package: duration,
                               price: '₹$basePrice',
@@ -607,11 +536,7 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                           ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2196F3),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2196F3), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       child: const Text('Done', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
                   ),
@@ -629,24 +554,32 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
       children: [
         Icon(icon, size: 18, color: color),
         const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-            Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-          ],
-        ),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+          Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        ]),
       ],
     );
   }
 
   Widget _buildFareRow(String label, String amount) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: Colors.black87)),
-        Text(amount, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-      ],
-    );
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(label, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(amount, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+    ]);
+  }
+}
+
+class _FeatureIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _FeatureIcon({required this.icon, required this.label});
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Icon(icon, color: Colors.grey, size: 28),
+      const SizedBox(height: 4),
+      Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+    ]);
   }
 }
