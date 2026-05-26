@@ -159,6 +159,10 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                       children: [
                         _buildConditionItem(Icons.person, 'Verified professional driver'),
                         const SizedBox(height: 8),
+                        _buildConditionItem(Icons.fastfood_outlined, 'Food charge extra for > 4 hour package'),
+                        const SizedBox(height: 8),
+                        _buildConditionItem(Icons.nightlight_round, 'Night drive extra charges (10 PM - 6 AM)'),
+                        const SizedBox(height: 8),
                         _buildConditionItem(Icons.toll, 'Tolls & parking extra (pay directly)'),
                         const SizedBox(height: 8),
                         _buildConditionItem(Icons.schedule, 'Overtime: ₹150/hour extra'),
@@ -504,6 +508,63 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.info_outline, color: Colors.red[900], size: 20),
+                              const SizedBox(width: 8),
+                              Text('Info', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red[900])),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Approximate Price :', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              Text('₹$basePrice', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('No of Days:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              Text(duration, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _buildBulletPoint('At 11pm ₹200 for night allowance'),
+                          _buildBulletPoint('Till 6am ₹200 for early morning charge'),
+                          _buildBulletPoint('Per hour overtime ₹100'),
+                          _buildBulletPoint('If you release the driver at 4 am then next day charges ₹1500 is applicable'),
+                          _buildBulletPoint('Food charges ₹200 per day'),
+                          const SizedBox(height: 16),
+                          Center(
+                            child: InkWell(
+                              onTap: () {},
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('View Cancellation Policy', style: TextStyle(color: Colors.red[900], fontWeight: FontWeight.w500, fontSize: 13)),
+                                  const SizedBox(width: 4),
+                                  Icon(Icons.info_outline, color: Colors.red[900], size: 14),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -567,6 +628,24 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
       Text(label, style: const TextStyle(fontSize: 13, color: Colors.black87)),
       Text(amount, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
     ]);
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 13, color: Colors.black87, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
