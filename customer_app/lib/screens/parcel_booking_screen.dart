@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
 import 'parcel_booking_details_screen.dart';
+import 'parcel_history_screen.dart';
 
 class ParcelBookingScreen extends StatefulWidget {
   const ParcelBookingScreen({super.key});
@@ -25,6 +26,7 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
   
   String _selectedItemType = 'Documents';
   String _selectedVehicle = 'Bike';
+  String _selectedTab = 'Send'; // 'Send' or 'Receive'
   
   final List<String> _itemTypes = ['Documents', 'Electronics', 'Clothing', 'Food', 'Fragile', 'Other'];
   
@@ -39,209 +41,364 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Send Parcel'),
+        title: const Text('Gora Parcel', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
         centerTitle: false,
-      ),
-      body: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-              // Locations Card
-              _buildSectionTitle('Delivery Route'),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  children: [
-                    _buildLocationRow(Icons.radio_button_checked, Color(0xFF4CAF50), 'Pickup Location', _pickupController),
-                    _buildVerticalDivider(),
-                    _buildLocationRow(Icons.location_on, Color(0xFFFF5252), 'Drop Location', _dropController),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Parcel Details
-              _buildSectionTitle('Parcel Details'),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Item Type', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _itemTypes.map((type) => _buildChoiceChip(type)).toList(),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildInputField('Weight (approx. kg)', _weightController, Icons.fitness_center, keyboardType: TextInputType.number),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Parcel Images
-              _buildSectionTitle('Parcel Images'),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Take multiple live images of the parcel', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _parcelImages.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == _parcelImages.length) {
-                            return GestureDetector(
-                              onTap: _pickImage,
-                              child: Container(
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.grey[300]!),
-                                ),
-                                child: const Icon(Icons.add_a_photo, color: AppTheme.primaryBlue, size: 30),
-                              ),
-                            );
-                          }
-                          return Stack(
-                            children: [
-                              Container(
-                                width: 100,
-                                margin: const EdgeInsets.only(right: 12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  image: DecorationImage(
-                                    image: FileImage(File(_parcelImages[index].path)),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 16,
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _parcelImages.removeAt(index)),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(Icons.close, color: Colors.white, size: 14),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Contact Details
-              _buildSectionTitle('Contact Information'),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  children: [
-                    _buildInputField('Sender Name', _senderNameController, Icons.person_outline),
-                    const SizedBox(height: 16),
-                    _buildInputField('Sender Phone', _senderPhoneController, Icons.phone_android, keyboardType: TextInputType.phone),
-                    const Divider(height: 32),
-                    _buildInputField('Receiver Name', _receiverNameController, Icons.person),
-                    const SizedBox(height: 16),
-                    _buildInputField('Receiver Phone', _receiverPhoneController, Icons.phone, keyboardType: TextInputType.phone),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Vehicle Selection
-              _buildSectionTitle('Choose Vehicle'),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _parcelVehicles.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) => _buildVehicleCard(_parcelVehicles[index]),
-              ),
-              const SizedBox(height: 24),
-
-              // Conditions
-              _buildSectionTitle('Booking Conditions'),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  children: [
-                    _buildConditionItem(Icons.security, 'Parcel contents must be legal and safe'),
-                    const SizedBox(height: 8),
-                    _buildConditionItem(Icons.timer, 'Standard delivery time: 1-2 hours'),
-                    const SizedBox(height: 8),
-                    _buildConditionItem(Icons.payment, 'Tolls/Parking extra (if applicable)'),
-                    const SizedBox(height: 8),
-                    _buildConditionItem(Icons.verified_user, 'Contactless delivery available'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-            ],
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ParcelHistoryScreen()),
+              );
+            },
+            icon: const Icon(Icons.history),
           ),
-        ),
+          const SizedBox(width: 8),
+        ],
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(20),
+      body: Column(
+        children: [
+          // Send / Receive Selection
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Expanded(child: _buildTabButton('Send', 'Send Parcel')),
+                const SizedBox(width: 12),
+                Expanded(child: _buildTabButton('Receive', 'Receive Parcel')),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _selectedTab == 'Send' ? _buildSendView() : _buildReceiveView(),
+          ),
+        ],
+      ),
+      bottomNavigationBar: _selectedTab == 'Send' 
+          ? Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, -5))],
+              ),
+              child: ElevatedButton(
+                onPressed: () => _showConfirmationPopup(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                  minimumSize: const Size(double.infinity, 54),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Proceed to Book', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              ),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildTabButton(String tab, String label) {
+    final isSelected = _selectedTab == tab;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTab = tab),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, -5))],
+          color: isSelected ? AppTheme.primaryBlue : Colors.grey[100],
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!),
         ),
-        child: ElevatedButton(
-          onPressed: () => _showConfirmationPopup(),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.primaryBlue,
-            minimumSize: const Size(double.infinity, 54),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
           ),
-          child: const Text('Proceed to Book', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSendView() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Locations Card
+            _buildSectionTitle('Delivery Route'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                  _buildLocationRow(Icons.radio_button_checked, Color(0xFF4CAF50), 'Pickup Location', _pickupController),
+                  _buildVerticalDivider(),
+                  _buildLocationRow(Icons.location_on, Color(0xFFFF5252), 'Drop Location', _dropController),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Parcel Details
+            _buildSectionTitle('Parcel Details'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Item Type', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _itemTypes.map((type) => _buildChoiceChip(type)).toList(),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInputField('Weight (approx. kg)', _weightController, Icons.fitness_center, keyboardType: TextInputType.number),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Parcel Images
+            _buildSectionTitle('Parcel Images'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Take multiple live images of the parcel', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _parcelImages.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == _parcelImages.length) {
+                          return GestureDetector(
+                            onTap: _pickImage,
+                            child: Container(
+                              width: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: const Icon(Icons.add_a_photo, color: AppTheme.primaryBlue, size: 30),
+                            ),
+                          );
+                        }
+                        return Stack(
+                          children: [
+                            Container(
+                              width: 100,
+                              margin: const EdgeInsets.only(right: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                image: DecorationImage(
+                                  image: FileImage(File(_parcelImages[index].path)),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 16,
+                              child: GestureDetector(
+                                onTap: () => setState(() => _parcelImages.removeAt(index)),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.close, color: Colors.white, size: 14),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Contact Details
+            _buildSectionTitle('Contact Information'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                  _buildInputField('Sender Name', _senderNameController, Icons.person_outline),
+                  const SizedBox(height: 16),
+                  _buildInputField('Sender Phone', _senderPhoneController, Icons.phone_android, keyboardType: TextInputType.phone),
+                  const Divider(height: 32),
+                  _buildInputField('Receiver Name', _receiverNameController, Icons.person),
+                  const SizedBox(height: 16),
+                  _buildInputField('Receiver Phone', _receiverPhoneController, Icons.phone, keyboardType: TextInputType.phone),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Vehicle Selection
+            _buildSectionTitle('Choose Vehicle'),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _parcelVehicles.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) => _buildVehicleCard(_parcelVehicles[index]),
+            ),
+            const SizedBox(height: 24),
+
+            // Conditions
+            _buildSectionTitle('Booking Conditions'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                  _buildConditionItem(Icons.security, 'Parcel contents must be legal and safe'),
+                  const SizedBox(height: 8),
+                  _buildConditionItem(Icons.timer, 'Standard delivery time: 1-2 hours'),
+                  const SizedBox(height: 8),
+                  _buildConditionItem(Icons.payment, 'Tolls/Parking extra (if applicable)'),
+                  const SizedBox(height: 8),
+                  _buildConditionItem(Icons.verified_user, 'Contactless delivery available'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReceiveView() {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBlue.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.local_shipping, size: 80, color: AppTheme.primaryBlue),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Your parcel is on the way!',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'A delivery partner has picked up your parcel and is heading to your location.',
+              style: TextStyle(fontSize: 15, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 40),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey[200]!),
+                boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10)],
+              ),
+              child: Column(
+                children: [
+                  _buildTrackingStep(Icons.check_circle, Colors.green, 'Booking Confirmed', '10:30 AM'),
+                  _buildTrackingLine(true),
+                  _buildTrackingStep(Icons.check_circle, Colors.green, 'Parcel Picked Up', '10:45 AM'),
+                  _buildTrackingLine(false),
+                  _buildTrackingStep(Icons.radio_button_checked, AppTheme.primaryBlue, 'On the way', 'ETA: 11:15 AM'),
+                  _buildTrackingLine(false),
+                  _buildTrackingStep(Icons.location_on_outlined, Colors.grey, 'Arriving at your location', '--'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.map_outlined),
+              label: const Text('Track on Map'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrackingStep(IconData icon, Color color, String title, String time) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        ),
+        Text(time, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildTrackingLine(bool isCompleted) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 11),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          width: 2,
+          height: 30,
+          color: isCompleted ? Colors.green : Colors.grey[200],
         ),
       ),
     );
