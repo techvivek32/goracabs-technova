@@ -78,7 +78,11 @@ class InvoiceScreen extends StatelessWidget {
                         children: const [
                           Text('Gora Cabs Private Limited', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                           Text('SURENDRA SHARMA', style: TextStyle(fontSize: 12)),
-                          Text('Ahmedabad, India', style: TextStyle(fontSize: 12)),
+                          Text(
+                            'Gora cabs & travels Pvt Ltd 1st Floor, Nanak Bhavan, Tempo Stand, Airforce Area, Jodhpur, Raj. 342011',
+                            style: TextStyle(fontSize: 10),
+                            textAlign: TextAlign.right,
+                          ),
                         ],
                       ),
                     ],

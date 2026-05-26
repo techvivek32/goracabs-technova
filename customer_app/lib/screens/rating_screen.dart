@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'invoice_screen.dart';
+import 'home_screen.dart';
 
 class RatingScreen extends StatefulWidget {
   final String driverName;
@@ -95,14 +95,10 @@ class _RatingScreenState extends State<RatingScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: selectedRating == 0 ? null : () {
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => InvoiceScreen(
-                          vehicleName: widget.vehicleName,
-                          selectedTip: widget.selectedTip,
-                        ),
-                      ),
+                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      (route) => false,
                     );
                   },
                   style: ElevatedButton.styleFrom(
