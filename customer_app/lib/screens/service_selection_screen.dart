@@ -7,19 +7,22 @@ import 'hire_driver_screen.dart';
 import 'parcel_booking_screen.dart';
 import 'mini_ride_screen.dart';
 import 'prime_ride_screen.dart';
+import 'support_screen.dart';
 
 class ServiceSelectionScreen extends StatelessWidget {
   const ServiceSelectionScreen({super.key});
 
   final List<Map<String, dynamic>> _services = const [
-    {'icon': 'assets/images/texi.png', 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/bike.png', 'label': 'Bike ride', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/auto.jpg', 'label': 'Auto ride', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
+    {'icon': 'assets/images/texi.png', 'label': 'Cab ride', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/rental.png', 'label': 'Rentals', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
     {'icon': 'assets/images/out-station.png', 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
-    {'icon': 'assets/images/rental.png', 'label': 'Rental', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
-    {'icon': 'assets/images/hiredriver.png', 'label': 'Hire Driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
     {'icon': 'assets/images/parcel.jpg', 'label': 'Parcel', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/hiredriver.png', 'label': 'Hire driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
     {'icon': 'assets/images/texi2.png', 'label': 'Mini Ride', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
     {'icon': 'assets/images/texi3.png', 'label': 'Prime Ride', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
-    {'icon': 'assets/images/query.jpg', 'label': 'Any Enquiry', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
+    {'icon': 'assets/images/query.jpg', 'label': 'Any inquiry', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
   ];
 
   @override
@@ -51,13 +54,13 @@ class ServiceSelectionScreen extends StatelessWidget {
   Widget _buildServiceItem(BuildContext context, Map<String, dynamic> service) {
     return GestureDetector(
       onTap: () {
-        if (service['label'] == 'Taxi') {
+        if (service['label'] == 'Cab ride' || service['label'] == 'Bike ride' || service['label'] == 'Auto ride') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxiBookingScreen()));
         } else if (service['label'] == 'Outstation') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OutstationScreen()));
-        } else if (service['label'] == 'Rental') {
+        } else if (service['label'] == 'Rentals') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const RentalScreen()));
-        } else if (service['label'] == 'Hire Driver') {
+        } else if (service['label'] == 'Hire driver') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const HireDriverScreen()));
         } else if (service['label'] == 'Parcel') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const ParcelBookingScreen()));
@@ -65,6 +68,8 @@ class ServiceSelectionScreen extends StatelessWidget {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const MiniRideScreen()));
         } else if (service['label'] == 'Prime Ride') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const PrimeRideScreen()));
+        } else if (service['label'] == 'Any inquiry') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
         }
       },
       child: Container(

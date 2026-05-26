@@ -30,14 +30,14 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentPromoPage = 0;
 
   final List<Map<String, dynamic>> _services = [
-    {'icon': 'assets/images/texi.png', 'label': 'Taxi', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
-    {'icon': 'assets/images/out-station.png', 'label': 'Outstation', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
-    {'icon': 'assets/images/rental.png', 'label': 'Rental', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
-    {'icon': 'assets/images/hiredriver.png', 'label': 'Hire Driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
-    {'icon': 'assets/images/parcel.jpg', 'label': 'Parcel', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
-    {'icon': 'assets/images/texi2.png', 'label': 'Mini Ride', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
-    {'icon': 'assets/images/texi3.png', 'label': 'Prime Ride', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
-    {'icon': 'assets/images/query.jpg', 'label': 'Any Enquiry', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
+    {'icon': 'assets/images/bike-bluebg.png', 'label': 'Bike ride', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/auto-bluebg.png', 'label': 'Auto ride', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
+    {'icon': 'assets/images/texi2-bluebg.png', 'label': 'Cab ride', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
+    {'icon': 'assets/images/rental-bluebg.png', 'label': 'Rentals', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
+    {'icon': 'assets/images/out-station-bluebg.png', 'label': 'Outstation', 'color': Color(0xFF2196F3), 'bgColor': Color(0xFFE3F2FD)},
+    {'icon': 'assets/images/parcel-bluebg.png', 'label': 'Parcel', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
+    {'icon': 'assets/images/hiredriver-bluebg.png', 'label': 'Hire driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
+    {'icon': 'assets/images/query-bluebg.png', 'label': 'Any inquiry', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
   ];
 
   final List<Map<String, String>> _recentLocations = [
@@ -544,20 +544,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildServiceItem(Map<String, dynamic> s) {
     return GestureDetector(
       onTap: () {
-        if (s['label'] == 'Taxi') {
+        if (s['label'] == 'Cab ride' || s['label'] == 'Bike ride' || s['label'] == 'Auto ride') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxiBookingScreen()));
         } else if (s['label'] == 'Outstation') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OutstationScreen()));
-        } else if (s['label'] == 'Rental') {
+        } else if (s['label'] == 'Rentals') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const RentalScreen()));
-        } else if (s['label'] == 'Hire Driver') {
+        } else if (s['label'] == 'Hire driver') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const HireDriverScreen()));
         } else if (s['label'] == 'Parcel') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const ParcelBookingScreen()));
-        } else if (s['label'] == 'Mini Ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const MiniRideScreen()));
-        } else if (s['label'] == 'Prime Ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const PrimeRideScreen()));
+        } else if (s['label'] == 'Any inquiry') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
         } else {
           // For new services, show a coming soon message or navigate to a placeholder
           ScaffoldMessenger.of(context).showSnackBar(
