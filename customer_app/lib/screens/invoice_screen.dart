@@ -79,7 +79,7 @@ class InvoiceScreen extends StatelessWidget {
                           Text('Gora Cabs Private Limited', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                           Text('SURENDRA SHARMA', style: TextStyle(fontSize: 12)),
                           Text(
-                            'Gora cabs & travels Pvt Ltd 1st Floor, Nanak Bhavan, Tempo Stand, Airforce Area, Jodhpur, Raj. 342011',
+                            'Jodhpur, Rajasthan 342011',
                             style: TextStyle(fontSize: 10),
                             textAlign: TextAlign.right,
                           ),
@@ -144,7 +144,7 @@ class InvoiceScreen extends StatelessWidget {
                         Text('Details of ECO under GST:', style: TextStyle(fontSize: 11, color: Colors.grey)),
                         SizedBox(height: 4),
                         Text(
-                          'Gora Cabs Private Limited / F-31 & F-32, First floor, Tower, Civil Lines, Jaipur, Rajasthan - 302007',
+                          'Gora cabs & travels Pvt Ltd 1st Floor, Nanak Bhavan , Tempo Stand , Airforce Area ,Jodhpur, Rajasthan 342011',
                           style: TextStyle(fontSize: 10, color: Colors.grey),
                           textAlign: TextAlign.center,
                         ),
