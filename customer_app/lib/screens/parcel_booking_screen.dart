@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
+import 'home_screen.dart';
+import 'rating_screen.dart';
 import 'parcel_booking_details_screen.dart';
 import 'parcel_history_screen.dart';
 
@@ -29,7 +31,9 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
   String _selectedTab = 'Send'; // 'Send' or 'Receive'
   
   final List<String> _itemTypes = ['Documents', 'Electronics', 'Clothing', 'Food', 'Fragile', 'Other'];
-  
+  bool _isSearching = false;
+  bool _driverAssigned = false;
+
   final List<Map<String, dynamic>> _parcelVehicles = [
     {'name': 'Bike', 'capacity': 'Up to 5 kg', 'image': 'assets/images/bike.png', 'price': '₹50'},
     {'name': 'Scooter', 'capacity': 'Up to 10 kg', 'image': 'assets/images/scooter.png', 'price': '₹80'},
@@ -692,29 +696,14 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ParcelBookingDetailsScreen(
-                            inquiryId: 'PRC${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-                            pickupLocation: _pickupController.text,
-                            dropLocation: _dropController.text,
-                            itemType: _selectedItemType,
-                            weight: _weightController.text,
-                            vehicle: _selectedVehicle,
-                            receiverName: _receiverNameController.text,
-                            receiverPhone: _receiverPhoneController.text,
-                            imagePaths: _parcelImages.map((e) => e.path).toList(),
-                          ),
-                        ),
-                      );
+                      _showFindingDriverDialog();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryBlue,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('Done', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    child: const Text('Confirm & Book', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ),
@@ -748,6 +737,195 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
         Text(label, style: const TextStyle(fontSize: 13, color: Colors.black87)),
         Text(amount, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
       ],
+    );
+  }
+
+  void _showFindingDriverDialog() {
+    setState(() {
+      _isSearching = true;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+            _showDriverAssignedDialog();
+          }
+        });
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2196F3))),
+              SizedBox(height: 16),
+              Text('Finding your Parcel Pilot', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text('Please wait while we connect you with a nearby pilot for your delivery.', style: TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
+              SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDriverAssignedDialog() {
+    setState(() {
+      _isSearching = false;
+      _driverAssigned = true;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -2))],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)))),
+              const Text('Pilot Assigned for Delivery', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))]),
+                child: Row(
+                  children: [
+                    Container(width: 55, height: 55, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey[200]!, width: 2), image: const DecorationImage(image: NetworkImage('https://i.pravatar.cc/150?u=parcelpilot'), fit: BoxFit.cover))),
+                    const SizedBox(width: 12),
+                    const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Suresh Kumar', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)), SizedBox(height: 4), Row(children: [Icon(Icons.star, color: Colors.amber, size: 16), SizedBox(width: 4), Text('4.7 (500+ deliveries)', style: TextStyle(fontSize: 13, color: Colors.grey))]), SizedBox(height: 4), Text('Blue Hero Splendor • RJ 14 GH 5678', style: TextStyle(fontSize: 11, color: Colors.grey))])),
+                    SizedBox(width: 70, height: 50, child: Image.asset(_parcelVehicles.firstWhere((v) => v['name'] == _selectedVehicle)['image'], fit: BoxFit.contain)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(child: ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.call, color: Colors.green), label: const Text('Call', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[200]!)), elevation: 2))),
+                  const SizedBox(width: 12),
+                  Expanded(child: ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.message, color: Color(0xFF2196F3)), label: const Text('Message', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[200]!)), elevation: 2))),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ParcelBookingDetailsScreen(
+                          inquiryId: 'GC-PARCEL-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+                          pickupLocation: _pickupController.text.isEmpty ? 'Current Location' : _pickupController.text,
+                          dropLocation: _dropController.text.isEmpty ? 'Not set' : _dropController.text,
+                          itemType: _selectedItemType,
+                          weight: _weightController.text.isEmpty ? '0' : _weightController.text,
+                          vehicle: _selectedVehicle,
+                          receiverName: _receiverNameController.text.isEmpty ? 'Not set' : _receiverNameController.text,
+                          receiverPhone: _receiverPhoneController.text.isEmpty ? 'Not set' : _receiverPhoneController.text,
+                          imagePaths: _parcelImages.map((img) => img.path).toList(),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2196F3),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Delivery Details', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Center(child: TextButton(onPressed: () => _showCancelReasonDialog(), child: const Text('Cancel Delivery', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 15)))),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCancelReasonDialog() {
+    final List<String> reasons = ['Plan changed', 'Pilot is too far', 'Found another way', 'Wait time is too long', 'Wrong details selected', 'Other'];
+    String? selectedReason;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)))),
+                  const Text('Cancel Delivery', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  const Text('Please select a reason for cancellation', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  const SizedBox(height: 20),
+                  ...reasons.map((reason) => RadioListTile<String>(title: Text(reason, style: const TextStyle(fontSize: 15)), value: reason, groupValue: selectedReason, activeColor: const Color(0xFF2196F3), contentPadding: EdgeInsets.zero, onChanged: (value) => setDialogState(() => selectedReason = value))),
+                  const SizedBox(height: 24),
+                  SizedBox(width: double.infinity, child: ElevatedButton(onPressed: selectedReason == null ? null : () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen()), (route) => false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2196F3), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Confirm Cancellation', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)))),
+                  const SizedBox(height: 12),
+                  Center(child: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Back', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)))),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showRideCompletedDialog() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 64),
+              const SizedBox(height: 16),
+              const Text('Delivery Completed!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text('Your parcel has been delivered successfully.', style: TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (context) => RatingScreen(driverName: 'Suresh Kumar', vehicleName: _selectedVehicle, selectedTip: 0))); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2196F3), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Rate Your Experience', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)))),
+            ],
+          ),
+        );
+      },
     );
   }
 }

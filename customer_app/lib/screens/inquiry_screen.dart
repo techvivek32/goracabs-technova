@@ -155,7 +155,7 @@ class _InquiryScreenState extends State<InquiryScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Book Now',
+                    'Request Inquiry',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,

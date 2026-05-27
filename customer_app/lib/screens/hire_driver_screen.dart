@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'hire_driver_booking_details_screen.dart';
+import 'home_screen.dart';
+import 'rating_screen.dart';
 
 class HireDriverScreen extends StatefulWidget {
   const HireDriverScreen({super.key});
@@ -22,6 +24,8 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
   TimeOfDay? _returnTime;
   int _selectedHours = 4;
   int _selectedDays = 1;
+  bool _isSearching = false;
+  bool _driverAssigned = false;
 
   final List<Map<String, dynamic>> _vehicles = [
     {'name': 'Sedan', 'type': 'Spacious', 'capacity': '4', 'icon': Icons.directions_car, 'color': Color(0xFF9C27B0), 'image': 'assets/images/texi2.png'},
@@ -571,38 +575,209 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, -5))]),
-                child: SafeArea(
-                  top: false,
-                  child: SizedBox(
+                child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        final duration = _hireDuration == 'Hourly' ? '$_selectedHours Hours' : '$_selectedDays Day(s)';
-                        final basePrice = _hireDuration == 'Hourly' ? _selectedHours * 150 : _selectedDays * 1500;
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HireDriverBookingDetailsScreen(
-                              inquiryId: 'HD${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-                              pickupLocation: _pickupController.text.isEmpty ? 'Current Location' : _pickupController.text,
-                              dropLocation: _dropController.text.isEmpty ? 'Not Specified' : _dropController.text,
-                              carType: '$_selectedVehicle ($_transmissionType)',
-                              hireDuration: _hireDuration,
-                              package: duration,
-                              price: '₹$basePrice',
-                              tripStartDate: _selectedDate == null ? 'Today' : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                              tripTime: _selectedTime == null ? 'Now' : _selectedTime!.format(context),
-                            ),
-                          ),
-                        );
+                        _showFindingDriverDialog();
                       },
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2196F3), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                      child: const Text('Done', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      child: const Text('Confirm Hire', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
-                  ),
                 ),
               ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFindingDriverDialog() {
+    setState(() {
+      _isSearching = true;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+            _showDriverAssignedDialog();
+          }
+        });
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2196F3))),
+              SizedBox(height: 16),
+              Text('Finding your Driver', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text('Please wait while we connect you with a nearby professional pilot.', style: TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
+              SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDriverAssignedDialog() {
+    setState(() {
+      _isSearching = false;
+      _driverAssigned = true;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -2))],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)))),
+              const Text('Professional Pilot Assigned', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))]),
+                child: Row(
+                  children: [
+                    Container(width: 55, height: 55, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey[200]!, width: 2), image: const DecorationImage(image: NetworkImage('https://i.pravatar.cc/150?u=hiredriver'), fit: BoxFit.cover))),
+                    const SizedBox(width: 12),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Manish Verma', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)), SizedBox(height: 4), Row(children: [Icon(Icons.star, color: Colors.amber, size: 16), SizedBox(width: 4), Text('4.9 (1.8k+ hire trips)', style: TextStyle(fontSize: 13, color: Colors.grey))]), SizedBox(height: 4), Text('Experience: 8+ Years • Verified Pro', style: TextStyle(fontSize: 11, color: Colors.grey))])),
+                    Icon(Icons.verified, color: Colors.blue, size: 30),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(child: ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.call, color: Colors.green), label: const Text('Call', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[200]!)), elevation: 2))),
+                  const SizedBox(width: 12),
+                  Expanded(child: ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.message, color: Color(0xFF2196F3)), label: const Text('Message', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[200]!)), elevation: 2))),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    final duration = _hireDuration == 'Hourly' ? '$_selectedHours Hours' : '$_selectedDays Day(s)';
+                    final basePrice = _hireDuration == 'Hourly' ? _selectedHours * 150 : _selectedDays * 1500;
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HireDriverBookingDetailsScreen(
+                          inquiryId: 'HD${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+                          pickupLocation: _pickupController.text.isEmpty ? 'Current Location' : _pickupController.text,
+                          dropLocation: _dropController.text.isEmpty ? 'Not Specified' : _dropController.text,
+                          carType: '$_selectedVehicle ($_transmissionType)',
+                          hireDuration: _hireDuration,
+                          package: duration,
+                          price: '₹$basePrice',
+                          tripStartDate: _selectedDate == null ? 'Today' : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                          tripTime: _selectedTime == null ? 'Now' : _selectedTime!.format(context),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2196F3),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Booking Details', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Center(child: TextButton(onPressed: () => _showCancelReasonDialog(), child: const Text('Cancel Hire', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 15)))),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCancelReasonDialog() {
+    final List<String> reasons = ['Plan changed', 'Driver is too far', 'Found another option', 'Wait time is too long', 'Wrong details selected', 'Other'];
+    String? selectedReason;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)))),
+                  const Text('Cancel Hire', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  const Text('Please select a reason for cancellation', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  const SizedBox(height: 20),
+                  ...reasons.map((reason) => RadioListTile<String>(title: Text(reason, style: const TextStyle(fontSize: 15)), value: reason, groupValue: selectedReason, activeColor: const Color(0xFF2196F3), contentPadding: EdgeInsets.zero, onChanged: (value) => setDialogState(() => selectedReason = value))),
+                  const SizedBox(height: 24),
+                  SizedBox(width: double.infinity, child: ElevatedButton(onPressed: selectedReason == null ? null : () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen()), (route) => false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2196F3), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Confirm Cancellation', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)))),
+                  const SizedBox(height: 12),
+                  Center(child: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Back', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)))),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showRideCompletedDialog() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 64),
+              const SizedBox(height: 16),
+              const Text('Hire Completed!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text('Your driver service has been completed successfully.', style: TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (context) => RatingScreen(driverName: 'Manish Verma', vehicleName: 'Driver Service', selectedTip: 0))); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2196F3), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Rate Your Driver', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)))),
             ],
           ),
         );
