@@ -37,6 +37,10 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   bool _locationConfirmed = false;
   bool _showFullTripMap = false;
   bool _showArrivingButtons = false;
+  bool _showMapPicker = false;
+  LatLng _selectedMapLocation = LatLng(28.6139, 77.2090);
+  final MapController _mapController = MapController();
+  List<TextEditingController> _stopControllers = [];
   
   final List<int> _tipAmounts = [10, 20, 50, 100];
 
@@ -56,6 +60,16 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
     if (widget.fromLocation != null && widget.toLocation != null) {
       _locationConfirmed = true;
     }
+  }
+
+  @override
+  void dispose() {
+    _pickupController.dispose();
+    _dropController.dispose();
+    for (var controller in _stopControllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   // Bike locations near user
@@ -566,6 +580,10 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
   }
 
   Widget _buildLocationSelectionScreen() {
+    if (_showMapPicker) {
+      return _buildMapPickerScreen();
+    }
+    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -588,6 +606,31 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
             child: Column(
               children: [
                 _buildLocationInput(Icons.radio_button_checked, _pickupController, const Color(0xFF4CAF50), 'Current Location'),
+                // Stops
+                ..._stopControllers.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  TextEditingController controller = entry.value;
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Row(
+                          children: [
+                            Column(
+                              children: List.generate(3, (index) => Container(
+                                margin: const EdgeInsets.symmetric(vertical: 1),
+                                width: 2,
+                                height: 4,
+                                color: Colors.grey[400],
+                              )),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _buildStopInput(controller, index),
+                    ],
+                  );
+                }).toList(),
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Row(
@@ -605,31 +648,42 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                 ),
                 _buildLocationInput(Icons.location_on, _dropController, const Color(0xFFFF5252), 'Select Destination'),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _showMapPicker = true;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.map, color: Colors.grey[700], size: 20),
                       ),
-                      child: Icon(Icons.map, color: Colors.grey[700], size: 20),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Select on map',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                    ),
-                    const Spacer(),
-                    TextButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.add_circle_outline, color: Color(0xFF2196F3), size: 20),
-                      label: const Text(
-                        'Add stop',
-                        style: TextStyle(color: Color(0xFF2196F3), fontSize: 14, fontWeight: FontWeight.w600),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'Select on map',
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                       ),
-                    ),
-                  ],
+                      const Spacer(),
+                      TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _stopControllers.add(TextEditingController(text: 'Add stop ${_stopControllers.length + 1}'));
+                          });
+                        },
+                        icon: const Icon(Icons.add_circle_outline, color: Color(0xFF2196F3), size: 20),
+                        label: const Text(
+                          'Add stop',
+                          style: TextStyle(color: Color(0xFF2196F3), fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -694,6 +748,268 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                   ),
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMapPickerScreen() {
+    return Scaffold(
+      body: Stack(
+        children: [
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: _selectedMapLocation,
+              initialZoom: 15.0,
+              onPositionChanged: (position, hasGesture) {
+                if (hasGesture && position.center != null) {
+                  setState(() {
+                    _selectedMapLocation = position.center!;
+                  });
+                }
+              },
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.goracabs.customer',
+              ),
+            ],
+          ),
+          // Center pin
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.location_on,
+                  color: Color(0xFFFF5252),
+                  size: 50,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 50),
+                  width: 4,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Top bar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.white,
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showMapPicker = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(Icons.arrow_back, size: 20),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Text(
+                            'Move map to select location',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Bottom confirm button
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.location_on, color: Color(0xFFFF5252), size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Selected Location',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                                ),
+                                Text(
+                                  'Lat: ${_selectedMapLocation.latitude.toStringAsFixed(4)}, Lng: ${_selectedMapLocation.longitude.toStringAsFixed(4)}',
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _dropController.text = 'Lat: ${_selectedMapLocation.latitude.toStringAsFixed(4)}, Lng: ${_selectedMapLocation.longitude.toStringAsFixed(4)}';
+                            _showMapPicker = false;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2196F3),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text(
+                          'Confirm Location',
+                          style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Current location button
+          Positioned(
+            bottom: 200,
+            right: 16,
+            child: FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.white,
+              onPressed: () {
+                setState(() {
+                  _selectedMapLocation = LatLng(28.6139, 77.2090);
+                });
+                _mapController.move(_selectedMapLocation, 15.0);
+              },
+              child: const Icon(Icons.my_location, color: Color(0xFF2196F3)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStopInput(TextEditingController controller, int index) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.orange[50],
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.location_on, color: Colors.orange, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: 'Add stop ${index + 1}',
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
+              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, height: 1.4),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                controller.dispose();
+                _stopControllers.removeAt(index);
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              child: const Icon(Icons.close, color: Colors.red, size: 20),
             ),
           ),
         ],
