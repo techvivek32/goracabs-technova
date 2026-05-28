@@ -106,111 +106,15 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Show full screen location selection first
+    if (!_locationConfirmed) {
+      return _buildLocationSelectionScreen();
+    }
+    
+    // Show map and vehicle selection after location is confirmed
     return Scaffold(
       body: Column(
         children: [
-          if (!_locationConfirmed)
-            Container(
-              color: Colors.white,
-              child: SafeArea(
-                bottom: false,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.arrow_back, size: 20),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => setState(() => _showLocationInputs = true),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey[300]!),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '${_pickupController.text} → ${_dropController.text}',
-                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Icon(Icons.edit, size: 16, color: Colors.grey[600]),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (_showLocationInputs)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Column(
-                          children: [
-                            _buildLocationInput(Icons.radio_button_checked, _pickupController, Color(0xFF4CAF50), 'Current Location'),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Row(
-                                children: [
-                                  Column(
-                                    children: List.generate(2, (index) => Container(
-                                      margin: const EdgeInsets.symmetric(vertical: 1),
-                                      width: 2,
-                                      height: 3,
-                                      color: Colors.grey[400],
-                                    )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            _buildLocationInput(Icons.location_on, _dropController, Color(0xFFFF5252), 'Select destination'),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (_dropController.text.isNotEmpty && _dropController.text != 'Select Destination') {
-                                    setState(() {
-                                      _showLocationInputs = false;
-                                      _locationConfirmed = true;
-                                    });
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF2196F3),
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                ),
-                                child: const Text('Confirm Location', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
           Expanded(
             child: Stack(
               children: [
@@ -657,6 +561,185 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLocationSelectionScreen() {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Drop',
+          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildLocationInput(Icons.radio_button_checked, _pickupController, const Color(0xFF4CAF50), 'Current Location'),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      Column(
+                        children: List.generate(3, (index) => Container(
+                          margin: const EdgeInsets.symmetric(vertical: 1),
+                          width: 2,
+                          height: 4,
+                          color: Colors.grey[400],
+                        )),
+                      ),
+                    ],
+                  ),
+                ),
+                _buildLocationInput(Icons.location_on, _dropController, const Color(0xFFFF5252), 'Select Destination'),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.map, color: Colors.grey[700], size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Select on map',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.add_circle_outline, color: Color(0xFF2196F3), size: 20),
+                      label: const Text(
+                        'Add stop',
+                        style: TextStyle(color: Color(0xFF2196F3), fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  'RECENT',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                ),
+                const SizedBox(height: 12),
+                _buildRecentLocation(
+                  'Audi Bangalore (Koramangala Road)',
+                  'Koramangala, Bangalore - 560',
+                ),
+                _buildRecentLocation(
+                  'Patna',
+                  'Bihar, Rajendra Nagar, Patna - 800',
+                ),
+                _buildRecentLocation(
+                  'JMD Mall (Sohna Road)',
+                  'Sector 48, Gurugram - 122018',
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_dropController.text.isNotEmpty && _dropController.text != 'Select Destination') {
+                      setState(() {
+                        _locationConfirmed = true;
+                      });
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2196F3),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text(
+                    'Confirm Location',
+                    style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentLocation(String title, String subtitle) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _dropController.text = title;
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.access_time, color: Colors.grey[600], size: 20),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.favorite_border, color: Colors.grey[400], size: 20),
+          ],
+        ),
       ),
     );
   }
