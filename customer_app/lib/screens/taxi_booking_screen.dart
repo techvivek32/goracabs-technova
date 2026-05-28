@@ -10,12 +10,14 @@ class TaxiBookingScreen extends StatefulWidget {
   final String? fromLocation;
   final String? toLocation;
   final bool hideLocationInputs;
+  final String? preselectedVehicle;
   
   const TaxiBookingScreen({
     super.key,
     this.fromLocation,
     this.toLocation,
     this.hideLocationInputs = false,
+    this.preselectedVehicle,
   });
 
   @override
@@ -44,6 +46,11 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
     // Set default locations
     _pickupController.text = widget.fromLocation ?? 'Current Location';
     _dropController.text = widget.toLocation ?? 'Select Destination';
+    
+    // Set preselected vehicle if provided
+    if (widget.preselectedVehicle != null) {
+      _selectedVehicle = widget.preselectedVehicle;
+    }
     
     // If locations are already provided, consider it confirmed
     if (widget.fromLocation != null && widget.toLocation != null) {

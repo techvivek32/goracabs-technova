@@ -649,7 +649,7 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -672,11 +672,57 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
                         _buildFareRow('Handling Charges', '₹0'),
                         const SizedBox(height: 8),
                         _buildFareRow('Taxes & Fees', '₹0'),
+                        const SizedBox(height: 8),
+                        _buildFareRow('Insurance', 'Included'),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Includes basic insurance for your parcel. Additional charges may apply for waiting time exceeding 15 minutes at pickup/drop.',
-                          style: TextStyle(fontSize: 11, color: Colors.grey, height: 1.4),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline, color: Colors.orange, size: 18),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Waiting time charges: ₹50 after 15 minutes at pickup/drop',
+                                  style: TextStyle(fontSize: 11, color: Colors.orange[900], fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.verified_user, color: Colors.green[700], size: 20),
+                            const SizedBox(width: 8),
+                            Text('Safety & Security', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green[700])),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        _buildMinimalConfirmRow(Icons.security, Colors.grey, 'Basic Insurance', 'Included for your parcel'),
+                        const SizedBox(height: 8),
+                        _buildMinimalConfirmRow(Icons.track_changes, Colors.grey, 'Live Tracking', 'Track your parcel in real-time'),
+                        const SizedBox(height: 8),
+                        _buildMinimalConfirmRow(Icons.verified_user_outlined, Colors.grey, 'Verified Partner', 'Background verified delivery pilot'),
+                        const SizedBox(height: 8),
+                        _buildMinimalConfirmRow(Icons.photo_camera, Colors.grey, 'Photo Proof', 'Delivery confirmation with photo'),
                       ],
                     ),
                   ),

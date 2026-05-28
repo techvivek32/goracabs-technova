@@ -528,96 +528,161 @@ class _RentalScreenState extends State<RentalScreen> {
                       const SizedBox(height: 24),
                       
                       // Date and Time
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                Text(
-                                  _selectedDate == null 
-                                    ? 'Today' 
-                                    : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                                ),
-                              ],
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today, size: 18, color: Colors.blue[700]),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Pickup Date & Time', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  Text(
+                                    '${_selectedDate == null ? 'Today' : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'} at ${_selectedTime == null ? 'Now' : _selectedTime!.format(context)}',
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Time', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                Text(
-                                  _selectedTime == null 
-                                    ? 'Now' 
-                                    : _selectedTime!.format(context),
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       
                       const SizedBox(height: 24),
                       
-                      // Price breakdown
-                      const Text('Price breakdown', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      // Package Details
+                      const Text('Package Details', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
                       
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Base price (${packageData['duration']})', style: const TextStyle(fontSize: 14)),
-                          Text(packageData['price'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Vehicle ($_selectedVehicle)', style: const TextStyle(fontSize: 14)),
-                          const Text('Included', style: TextStyle(fontSize: 14, color: Colors.green)),
-                        ],
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(Icons.directions_car, color: Colors.blue[700], size: 20),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(_selectedVehicle!, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                                      Text('${vehicleData['type']} • ${vehicleData['capacity']} seats', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Divider(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Duration', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                Text(packageData['duration'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Distance Included', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                Text(packageData['distance'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Rate per hour', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                Text('₹${vehicleData['pricePerHour']}/hr', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                       
-                      const Divider(height: 24),
+                      const SizedBox(height: 16),
                       
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Total price', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          Text(
-                            packageData['price'],
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2196F3)),
-                          ),
-                        ],
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF4CAF50).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Total Package Price', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text(
+                              packageData['price'],
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // What's Included
+                      const Text('What\'s Included', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.withOpacity(0.2)),
+                        ),
+                        child: Column(
+                          children: [
+                            _buildConditionItem(Icons.check_circle, 'Unlimited stops within package', 'Make as many stops as you need'),
+                            const SizedBox(height: 12),
+                            _buildConditionItem(Icons.check_circle, 'Fixed pricing, no surge', 'Price locked at booking time'),
+                            const SizedBox(height: 12),
+                            _buildConditionItem(Icons.check_circle, 'Professional driver', 'Verified and experienced pilot'),
+                            const SizedBox(height: 12),
+                            _buildConditionItem(Icons.check_circle, 'AC vehicle', 'Comfortable air-conditioned ride'),
+                          ],
+                        ),
                       ),
                       
                       const SizedBox(height: 24),
                       
                       // Things to keep in mind
-                      const Text('Things to keep in mind', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Text('Additional Charges', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
                       
                       _buildConditionItem(
-                        Icons.toll,
-                        'Tolls and interstate charges are extra',
-                        'Final charges may vary based on your route - pay the driver directly',
-                      ),
-                      const SizedBox(height: 12),
-                      _buildConditionItem(
-                        Icons.local_parking,
-                        'Parking charges',
-                        'Extra charges apply for paid parking',
+                        Icons.add_road,
+                        'Extra km charges',
+                        'Beyond ${packageData['distance']}: ₹10/km',
                       ),
                       const SizedBox(height: 12),
                       _buildConditionItem(
                         Icons.schedule,
                         'Extra time charges',
-                        'Additional charges beyond package duration apply',
+                        'Beyond ${packageData['duration']}: ₹100/hr',
                       ),
                     ],
                   ),

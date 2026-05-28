@@ -2,9 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'taxi_booking_screen.dart';
-import 'bike_ride_screen.dart';
-import 'auto_ride_screen.dart';
-import 'cab_ride_screen.dart';
 import 'outstation_screen.dart';
 import 'rental_screen.dart';
 import 'hire_driver_screen.dart';
@@ -42,11 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
     {'icon': 'assets/images/parcel-bluebg.png', 'label': 'Parcel', 'color': Color(0xFFFF9800), 'bgColor': Color(0xFFFFF3E0)},
     {'icon': 'assets/images/hiredriver-bluebg.png', 'label': 'Hire driver', 'color': Color(0xFF9C27B0), 'bgColor': Color(0xFFF3E5F5)},
     {'icon': 'assets/images/query-bluebg.png', 'label': 'Any inquiry', 'color': Color(0xFF4CAF50), 'bgColor': Color(0xFFE8F5E9)},
-  ];
-
-  final List<Map<String, String>> _recentLocations = [
-    {'name': 'Home', 'address': '12, MG Road, Delhi'},
-    {'name': 'Office', 'address': 'Cyber City, Gurugram'},
   ];
 
   final List<Map<String, String>> _popularLocations = [
@@ -213,21 +205,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 child: TextField(
-                  onTap: null, // Remove the onTap to allow typing
-                  readOnly: false, // Allow editing
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TaxiBookingScreen(
+                          fromLocation: 'Current Location',
+                          hideLocationInputs: false,
+                        ),
+                      ),
+                    );
+                  },
+                  readOnly: true,
                   decoration: InputDecoration(
                     hintText: 'Where are you going?',
                     hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
                     prefixIcon: const Icon(Icons.search, color: AppTheme.primaryBlue, size: 22),
                     suffixIcon: IconButton(
                       onPressed: () {
-                        print('Search arrow tapped');
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => TaxiBookingScreen(
                               fromLocation: 'Current Location',
-                              hideLocationInputs: true,
+                              hideLocationInputs: false,
                             ),
                           ),
                         );
@@ -254,36 +255,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      color: Color(0xFFF8F8F8),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      child: Column(
-                        children: _recentLocations.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final loc = entry.value;
-                          return Column(
-                            children: [
-                              _buildRecentItem(loc),
-                              if (index < _recentLocations.length - 1)
-                                Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 8),
-                                  child: Row(
-                                    children: [
-                                      const SizedBox(width: 32),
-                                      Expanded(
-                                        child: CustomPaint(
-                                          size: const Size(double.infinity, 1),
-                                          painter: DottedLinePainter(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
                     const SizedBox(height: 24),
                     
                     const Text('Popular Places', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -326,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const Text('Featured Ads', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 110,
+                      height: 160,
                       child: PageView.builder(
                         controller: _promoController,
                         itemCount: _promos.length,
@@ -337,6 +308,38 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         itemBuilder: (_, i) => _buildPromoBanner(_promos[i]),
                       ),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Why Choose Us Section
+                    const Text('Why Choose Gora Cabs?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    _buildFeatureCard(
+                      icon: Icons.verified_user,
+                      title: 'Safe & Secure',
+                      description: 'All drivers are verified and background checked',
+                      color: Colors.green,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildFeatureCard(
+                      icon: Icons.access_time,
+                      title: '24/7 Available',
+                      description: 'Book rides anytime, anywhere across India',
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildFeatureCard(
+                      icon: Icons.payments,
+                      title: 'Best Prices',
+                      description: 'Affordable rates with no hidden charges',
+                      color: Colors.orange,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildFeatureCard(
+                      icon: Icons.support_agent,
+                      title: 'Customer Support',
+                      description: 'Dedicated support team to help you 24/7',
+                      color: Colors.purple,
                     ),
                     const SizedBox(height: 20),
                     
@@ -412,52 +415,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentItem(Map<String, String> location) {
-    return GestureDetector(
-      onTap: () {
-        print('Recent location tapped: ${location['name']}');
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => TaxiBookingScreen(
-              fromLocation: 'Current Location',
-              toLocation: location['address']!,
-              hideLocationInputs: true,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        color: Colors.transparent,
-        child: Row(
-          children: [
-            Icon(Icons.access_time, color: Colors.grey[600], size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    location['name']!,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    location['address']!,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
               ),
             ),
           ],
@@ -549,11 +506,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         if (s['label'] == 'Bike ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const BikeRideScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TaxiBookingScreen(
+                fromLocation: 'Current Location',
+                hideLocationInputs: false,
+                preselectedVehicle: 'Bike',
+              ),
+            ),
+          );
         } else if (s['label'] == 'Auto ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const AutoRideScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TaxiBookingScreen(
+                fromLocation: 'Current Location',
+                hideLocationInputs: false,
+                preselectedVehicle: 'Auto',
+              ),
+            ),
+          );
         } else if (s['label'] == 'Cab ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const CabRideScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TaxiBookingScreen(
+                fromLocation: 'Current Location',
+                hideLocationInputs: false,
+                preselectedVehicle: 'Cab Economy',
+              ),
+            ),
+          );
         } else if (s['label'] == 'Outstation') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OutstationScreen()));
         } else if (s['label'] == 'Rentals') {
@@ -612,7 +596,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -632,18 +616,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               adIcon,
               color: color,
-              size: 20,
+              size: 32,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,15 +638,91 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: const TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 18,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   promo['sub']!,
                   style: TextStyle(
                     color: Colors.grey[600],
-                    fontSize: 12,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: color.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    'Learn More',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
                   ),
                 ),
               ],
@@ -781,32 +841,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
-
-class DottedLinePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey[300]!
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    const dashWidth = 4.0;
-    const dashSpace = 4.0;
-    double startX = 0;
-
-    while (startX < size.width) {
-      canvas.drawLine(
-        Offset(startX, 0),
-        Offset(startX + dashWidth, 0),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
 class RajasthaniPatternPainter extends CustomPainter {

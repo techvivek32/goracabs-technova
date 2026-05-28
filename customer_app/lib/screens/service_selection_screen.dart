@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'taxi_booking_screen.dart';
-import 'bike_ride_screen.dart';
-import 'auto_ride_screen.dart';
-import 'cab_ride_screen.dart';
 import 'outstation_screen.dart';
 import 'rental_screen.dart';
 import 'hire_driver_screen.dart';
@@ -59,11 +56,38 @@ class ServiceSelectionScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (service['label'] == 'Bike ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const BikeRideScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TaxiBookingScreen(
+                fromLocation: 'Current Location',
+                hideLocationInputs: false,
+                preselectedVehicle: 'Bike',
+              ),
+            ),
+          );
         } else if (service['label'] == 'Auto ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const AutoRideScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TaxiBookingScreen(
+                fromLocation: 'Current Location',
+                hideLocationInputs: false,
+                preselectedVehicle: 'Auto',
+              ),
+            ),
+          );
         } else if (service['label'] == 'Cab ride') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const CabRideScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TaxiBookingScreen(
+                fromLocation: 'Current Location',
+                hideLocationInputs: false,
+                preselectedVehicle: 'Cab Economy',
+              ),
+            ),
+          );
         } else if (service['label'] == 'Outstation') {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OutstationScreen()));
         } else if (service['label'] == 'Rentals') {

@@ -843,64 +843,58 @@ class _OutstationScreenState extends State<OutstationScreen> {
                       const SizedBox(height: 24),
                       
                       // Trip Details
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Departure Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                Text(
-                                  _departureDateController.text.isEmpty ? 'Today' : _departureDateController.text,
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Time', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                Text(
-                                  _departureTimeController.text.isEmpty ? 'Now' : _departureTimeController.text,
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      if (_tripType == 'Round Trip') ...[
-                        const SizedBox(height: 16),
-                        Row(
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
                           children: [
+                            Icon(Icons.calendar_today, size: 16, color: Colors.blue[700]),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Return Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  const Text('Departure', style: TextStyle(fontSize: 11, color: Colors.grey)),
                                   Text(
-                                    _returnDateController.text.isEmpty ? 'Select date' : _returnDateController.text,
-                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Return Time', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                  Text(
-                                    _returnTimeController.text.isEmpty ? 'Select time' : _returnTimeController.text,
-                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                    '${_departureDateController.text.isEmpty ? 'Today' : _departureDateController.text} • ${_departureTimeController.text.isEmpty ? 'Now' : _departureTimeController.text}',
+                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                                   ),
                                 ],
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                      
+                      if (_tripType == 'Round Trip') ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.event_repeat, size: 16, color: Colors.orange[700]),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Return', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                                    Text(
+                                      '${_returnDateController.text.isEmpty ? 'Select date' : _returnDateController.text} • ${_returnTimeController.text.isEmpty ? 'Select time' : _returnTimeController.text}',
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                       
@@ -910,39 +904,117 @@ class _OutstationScreenState extends State<OutstationScreen> {
                       const Text('Trip Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
                       
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Vehicle ($_selectedVehicle)', style: const TextStyle(fontSize: 14)),
-                          Text(currentPrice, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Trip Type', style: const TextStyle(fontSize: 14)),
-                          Text(_tripType, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                        ],
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(Icons.directions_car, color: Colors.blue[700], size: 20),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(_selectedVehicle!, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                                      Text('${selectedVehicleData['type']} • ${selectedVehicleData['capacity']} seats', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                    ],
+                                  ),
+                                ),
+                                Text(currentPrice, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2196F3))),
+                              ],
+                            ),
+                            const Divider(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Trip Type', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                Text(_tripType, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Estimated Distance', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                const Text('~250 km', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Estimated Duration', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                const Text('~5 hours', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                       
-                      const Divider(height: 24),
+                      const SizedBox(height: 16),
                       
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Total price', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          Text(
-                            currentPrice,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
-                          ),
-                        ],
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF4CAF50).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Total Fare', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text(
+                              currentPrice,
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
+                            ),
+                          ],
+                        ),
                       ),
                       
                       const SizedBox(height: 24),
                       
+                      // Inclusions
+                      const Text('What\'s Included', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.withOpacity(0.2)),
+                        ),
+                        child: Column(
+                          children: [
+                            _buildDialogConditionItem(Icons.check_circle, 'Professional verified driver'),
+                            const SizedBox(height: 8),
+                            _buildDialogConditionItem(Icons.check_circle, 'Fuel included in base fare'),
+                            const SizedBox(height: 8),
+                            _buildDialogConditionItem(Icons.check_circle, 'AC vehicle with comfortable seats'),
+                            const SizedBox(height: 8),
+                            _buildDialogConditionItem(Icons.check_circle, 'Live GPS tracking'),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
                       // Conditions
-                      const Text('Trip Conditions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Text('Additional Charges', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
                       
                       if (_tripType == 'One Way') ...[
