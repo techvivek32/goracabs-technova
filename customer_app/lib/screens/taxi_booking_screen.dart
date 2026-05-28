@@ -929,6 +929,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
                           setState(() {
                             _dropController.text = 'Lat: ${_selectedMapLocation.latitude.toStringAsFixed(4)}, Lng: ${_selectedMapLocation.longitude.toStringAsFixed(4)}';
                             _showMapPicker = false;
+                            _locationConfirmed = true;
                           });
                         },
                         style: ElevatedButton.styleFrom(
@@ -1022,6 +1023,7 @@ class _TaxiBookingScreenState extends State<TaxiBookingScreen> {
       onTap: () {
         setState(() {
           _dropController.text = title;
+          _locationConfirmed = true;
         });
       },
       child: Padding(
