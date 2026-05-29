@@ -833,6 +833,12 @@ class _RentalScreenState extends State<RentalScreen> {
                           price: packageData['price'],
                           date: _selectedDate == null ? 'Today' : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
                           time: _selectedTime == null ? 'Now' : _selectedTime!.format(context),
+                          driverName: 'Vikram Singh',
+                          driverRating: '4.9 (1.2k+ trips)',
+                          driverExperience: '5 Years',
+                          vehicleNumber: 'RJ 14 CD 9012',
+                          vehicleModel: 'Toyota Innova',
+                          vehicleColor: 'White',
                         ),
                       ),
                     );

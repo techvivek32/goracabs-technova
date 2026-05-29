@@ -6,6 +6,7 @@ import 'home_screen.dart';
 import 'rating_screen.dart';
 import 'booking_screen.dart';
 import 'booking_inquiry_screen.dart';
+import 'outstation_ride_details_screen.dart';
 
 class OutstationScreen extends StatefulWidget {
   const OutstationScreen({super.key});
@@ -1217,14 +1218,42 @@ class _OutstationScreenState extends State<OutstationScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    _showRideCompletedDialog();
+                    final selectedVehicleData = _vehicles.firstWhere((v) => v['name'] == _selectedVehicle);
+                    final currentPrice = _tripType == 'One Way' ? selectedVehicleData['oneWayPrice'] : selectedVehicleData['roundTripPrice'];
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OutstationRideDetailsScreen(
+                          inquiryId: 'GC-OUT-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+                          fromLocation: _fromController.text.isEmpty ? 'Current Location' : _fromController.text,
+                          toLocation: _toController.text.isEmpty ? 'Select Destination' : _toController.text,
+                          vehicleName: _selectedVehicle!,
+                          vehicleType: selectedVehicleData['type'],
+                          capacity: selectedVehicleData['capacity'],
+                          tripType: _tripType,
+                          departureDate: _departureDateController.text.isEmpty ? 'Today' : _departureDateController.text,
+                          departureTime: _departureTimeController.text.isEmpty ? 'Now' : _departureTimeController.text,
+                          returnDate: _tripType == 'Round Trip' ? (_returnDateController.text.isEmpty ? 'Not Set' : _returnDateController.text) : null,
+                          returnTime: _tripType == 'Round Trip' ? (_returnTimeController.text.isEmpty ? 'Not Set' : _returnTimeController.text) : null,
+                          price: currentPrice,
+                          estimatedDistance: '~250 km',
+                          estimatedDuration: '~5 hours',
+                          driverName: 'Rahul Sharma',
+                          driverRating: '4.8 (2.5k+ trips)',
+                          driverExperience: '7 Years',
+                          vehicleNumber: 'RJ 14 EF 1234',
+                          vehicleModel: 'Mahindra Marazzo',
+                          vehicleColor: 'Silver',
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2196F3),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('End Trip', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: const Text('Trip Details', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
               const SizedBox(height: 12),

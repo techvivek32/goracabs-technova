@@ -723,6 +723,12 @@ class _HireDriverScreenState extends State<HireDriverScreen> {
                           price: '₹$basePrice',
                           tripStartDate: _selectedDate == null ? 'Today' : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
                           tripTime: _selectedTime == null ? 'Now' : _selectedTime!.format(context),
+                          driverName: 'Manish Verma',
+                          driverRating: '4.9 (1.8k+ trips)',
+                          driverExperience: '8 Years',
+                          vehicleNumber: 'DL 03 CD 9876',
+                          vehicleModel: 'Honda City',
+                          vehicleColor: 'White',
                         ),
                       ),
                     );
