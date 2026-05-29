@@ -423,6 +423,81 @@ class RentalBookingDetailsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // Rental Conditions
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey[200]!),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.red[900], size: 20),
+                        const SizedBox(width: 8),
+                        Text('Rental Conditions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red[900])),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildConditionItem('Tolls and parking charges are extra'),
+                    _buildConditionItem('Fuel included in the package'),
+                    _buildConditionItem('Overtime charges ₹150 per hour beyond package duration'),
+                    _buildConditionItem('Night charges (11 PM - 6 AM) ₹200 extra'),
+                    _buildConditionItem('Driver allowance ₹200 per day for outstation'),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.payment, color: Colors.orange, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Additional charges to be paid directly to driver',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.orange[800],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: InkWell(
+                        onTap: () {},
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('View Cancellation Policy', style: TextStyle(color: Colors.red[900], fontWeight: FontWeight.w500, fontSize: 13)),
+                            const SizedBox(width: 4),
+                            Icon(Icons.info_outline, color: Colors.red[900], size: 14),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 32),
 
               // Back to Home Button
@@ -518,6 +593,24 @@ class RentalBookingDetailsScreen extends StatelessWidget {
         const SizedBox(height: 4),
         Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
       ],
+    );
+  }
+
+  Widget _buildConditionItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 13, color: Colors.black87, height: 1.4),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

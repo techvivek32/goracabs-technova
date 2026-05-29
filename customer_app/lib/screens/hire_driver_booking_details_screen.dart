@@ -16,6 +16,9 @@ class HireDriverBookingDetailsScreen extends StatelessWidget {
   final String? driverRating;
   final String? driverPhone;
   final String? driverExperience;
+  final String? vehicleNumber;
+  final String? vehicleModel;
+  final String? vehicleColor;
 
   const HireDriverBookingDetailsScreen({
     Key? key,
@@ -32,6 +35,9 @@ class HireDriverBookingDetailsScreen extends StatelessWidget {
     this.driverRating,
     this.driverPhone,
     this.driverExperience,
+    this.vehicleNumber,
+    this.vehicleModel,
+    this.vehicleColor,
   }) : super(key: key);
 
   @override
@@ -214,6 +220,108 @@ class HireDriverBookingDetailsScreen extends StatelessWidget {
                                 ),
                                 elevation: 2,
                               ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+
+              // Vehicle Details Card (if vehicle is assigned)
+              if (vehicleNumber != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey[200]!),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.directions_car, color: AppTheme.primaryBlue, size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Your Vehicle Details',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                'assets/images/economy.png',
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.directions_car, size: 40, color: AppTheme.primaryBlue);
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  vehicleModel ?? 'Honda City',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  vehicleNumber!,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppTheme.primaryBlue,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 12,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color: _getColorFromName(vehicleColor ?? 'White'),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.grey[300]!),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      vehicleColor ?? 'White',
+                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -422,6 +530,26 @@ class HireDriverBookingDetailsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Color _getColorFromName(String colorName) {
+    switch (colorName.toLowerCase()) {
+      case 'white':
+        return Colors.white;
+      case 'black':
+        return Colors.black;
+      case 'silver':
+      case 'grey':
+        return Colors.grey;
+      case 'red':
+        return Colors.red;
+      case 'blue':
+        return Colors.blue;
+      case 'green':
+        return Colors.green;
+      default:
+        return Colors.white;
+    }
   }
 
   Widget _buildConditionItem(IconData icon, String text) {
