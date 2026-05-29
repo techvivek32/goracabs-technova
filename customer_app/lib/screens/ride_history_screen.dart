@@ -3,6 +3,9 @@ import '../theme/app_theme.dart';
 import 'invoice_screen.dart';
 import 'home_screen.dart';
 import 'service_selection_screen.dart';
+import 'rental_booking_details_screen.dart';
+import 'hire_driver_booking_details_screen.dart';
+import 'outstation_ride_details_screen.dart';
 
 class RideHistoryScreen extends StatefulWidget {
   const RideHistoryScreen({super.key});
@@ -374,7 +377,29 @@ class _RideHistoryScreenState extends State<RideHistoryScreen> {
             children: [
               Expanded(
                 child: TextButton.icon(
-                  onPressed: () => _showRentalDetails(rental),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RentalBookingDetailsScreen(
+                          inquiryId: 'RNT${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+                          pickupLocation: 'MG Road, Delhi',
+                          dropLocation: 'Cyber City, Gurugram',
+                          duration: rental['duration'] as String,
+                          vehicle: rental['vehicle'] as String,
+                          price: rental['fare'] as String,
+                          date: rental['date'] as String,
+                          time: '9:00 AM',
+                          driverName: 'Suresh Kumar',
+                          driverRating: '4.9 (1.2k+ trips)',
+                          driverExperience: '8 years experience',
+                          vehicleNumber: 'DL 01 AB 1234',
+                          vehicleModel: 'Maruti Swift Dzire',
+                          vehicleColor: 'White',
+                        ),
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.info_outline, size: 14),
                   label: const Text('Details', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
@@ -438,7 +463,27 @@ class _RideHistoryScreenState extends State<RideHistoryScreen> {
             children: [
               Expanded(
                 child: TextButton.icon(
-                  onPressed: () => _showHireDriverDetails(hire),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HireDriverBookingDetailsScreen(
+                          inquiryId: 'HRD${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+                          pickupLocation: 'MG Road, Delhi',
+                          dropLocation: 'Cyber City, Gurugram',
+                          carType: 'Sedan',
+                          hireDuration: hire['duration'] as String,
+                          package: '1 Day',
+                          price: hire['fare'] as String,
+                          tripStartDate: hire['date'] as String,
+                          tripTime: '2:00 PM',
+                          driverName: hire['driver'] as String,
+                          driverRating: '4.8 (500+ trips)',
+                          driverExperience: '5 years experience',
+                        ),
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.info_outline, size: 14),
                   label: const Text('Details', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
@@ -502,7 +547,27 @@ class _RideHistoryScreenState extends State<RideHistoryScreen> {
             children: [
               Expanded(
                 child: TextButton.icon(
-                  onPressed: () => _showOutstationDetails(outstation),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OutstationRideDetailsScreen(
+                          inquiryId: 'OUT${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+                          fromLocation: outstation['from'] as String,
+                          toLocation: outstation['to'] as String,
+                          vehicleName: outstation['vehicle'] as String,
+                          vehicleType: 'Premium',
+                          capacity: '4',
+                          tripType: 'One Way',
+                          departureDate: outstation['date'] as String,
+                          departureTime: '6:00 AM',
+                          price: outstation['fare'] as String,
+                          estimatedDistance: '~250 km',
+                          estimatedDuration: '~5 hours',
+                        ),
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.info_outline, size: 14),
                   label: const Text('Details', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(foregroundColor: AppTheme.primaryBlue),
