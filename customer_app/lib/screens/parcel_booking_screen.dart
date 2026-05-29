@@ -891,6 +891,12 @@ class _ParcelBookingScreenState extends State<ParcelBookingScreen> {
                           receiverName: _receiverNameController.text.isEmpty ? 'Not set' : _receiverNameController.text,
                           receiverPhone: _receiverPhoneController.text.isEmpty ? 'Not set' : _receiverPhoneController.text,
                           imagePaths: _parcelImages.map((img) => img.path).toList(),
+                          driverName: 'Suresh Kumar',
+                          driverRating: '4.7 (500+ deliveries)',
+                          driverExperience: '3 Years',
+                          vehicleNumber: 'RJ 14 GH 5678',
+                          vehicleModel: 'Hero Splendor',
+                          vehicleColor: 'Blue',
                         ),
                       ),
                     );

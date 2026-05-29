@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'parcel_booking_details_screen.dart';
 
 class ParcelHistoryScreen extends StatefulWidget {
   const ParcelHistoryScreen({super.key});
@@ -18,9 +19,19 @@ class _ParcelHistoryScreenState extends State<ParcelHistoryScreen> with SingleTi
       'pickup': 'Arvind Nagar, Jodhpur',
       'drop': 'Clock Tower, Jodhpur',
       'item': 'Electronics',
+      'weight': '2',
+      'vehicle': 'Scooter',
+      'receiverName': 'Rajesh Kumar',
+      'receiverPhone': '+91 98765 43210',
       'price': '₹80',
       'status': 'Delivered',
       'statusColor': Colors.green,
+      'driverName': 'Suresh Kumar',
+      'driverRating': '4.7 (500+ deliveries)',
+      'driverExperience': '3 Years',
+      'vehicleNumber': 'RJ 14 GH 5678',
+      'vehicleModel': 'Hero Splendor',
+      'vehicleColor': 'Blue',
     },
     {
       'id': 'PRC5291',
@@ -28,9 +39,19 @@ class _ParcelHistoryScreenState extends State<ParcelHistoryScreen> with SingleTi
       'pickup': 'Sardarpura, Jodhpur',
       'drop': 'Paota, Jodhpur',
       'item': 'Documents',
+      'weight': '0.5',
+      'vehicle': 'Bike',
+      'receiverName': 'Amit Sharma',
+      'receiverPhone': '+91 98765 12345',
       'price': '₹50',
       'status': 'Cancelled',
       'statusColor': Colors.red,
+      'driverName': 'Ramesh Singh',
+      'driverRating': '4.5 (300+ deliveries)',
+      'driverExperience': '2 Years',
+      'vehicleNumber': 'RJ 14 AB 1234',
+      'vehicleModel': 'Honda Activa',
+      'vehicleColor': 'Black',
     },
   ];
 
@@ -41,9 +62,19 @@ class _ParcelHistoryScreenState extends State<ParcelHistoryScreen> with SingleTi
       'pickup': 'Ratanada, Jodhpur',
       'drop': 'Airforce Area, Jodhpur',
       'item': 'Food Items',
+      'weight': '1.5',
+      'vehicle': 'Bike',
+      'receiverName': 'Priya Verma',
+      'receiverPhone': '+91 98765 67890',
       'price': '₹60',
-      'status': 'On the way',
+      'status': 'Booking Confirmed',
       'statusColor': AppTheme.primaryBlue,
+      'driverName': 'Vijay Kumar',
+      'driverRating': '4.8 (600+ deliveries)',
+      'driverExperience': '4 Years',
+      'vehicleNumber': 'RJ 14 CD 5678',
+      'vehicleModel': 'Bajaj Pulsar',
+      'vehicleColor': 'Red',
     },
     {
       'id': 'PRC3829',
@@ -51,9 +82,19 @@ class _ParcelHistoryScreenState extends State<ParcelHistoryScreen> with SingleTi
       'pickup': 'Basni, Jodhpur',
       'drop': 'Shastri Nagar, Jodhpur',
       'item': 'Clothing',
+      'weight': '3',
+      'vehicle': 'Scooter',
+      'receiverName': 'Neha Patel',
+      'receiverPhone': '+91 98765 11111',
       'price': '₹55',
       'status': 'Delivered',
       'statusColor': Colors.green,
+      'driverName': 'Mohan Lal',
+      'driverRating': '4.6 (400+ deliveries)',
+      'driverExperience': '3 Years',
+      'vehicleNumber': 'RJ 14 EF 9012',
+      'vehicleModel': 'TVS Jupiter',
+      'vehicleColor': 'White',
     },
   ];
 
@@ -119,71 +160,97 @@ class _ParcelHistoryScreenState extends State<ParcelHistoryScreen> with SingleTi
       itemCount: history.length,
       itemBuilder: (context, index) {
         final item = history[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[200]!),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10, offset: const Offset(0, 4)),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'ID: ${item['id']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: (item['statusColor'] as Color).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ParcelBookingDetailsScreen(
+                  inquiryId: item['id'],
+                  pickupLocation: item['pickup'],
+                  dropLocation: item['drop'],
+                  itemType: item['item'],
+                  weight: item['weight'],
+                  vehicle: item['vehicle'],
+                  receiverName: item['receiverName'],
+                  receiverPhone: item['receiverPhone'],
+                  imagePaths: const [],
+                  driverName: item['driverName'],
+                  driverRating: item['driverRating'],
+                  driverExperience: item['driverExperience'],
+                  vehicleNumber: item['vehicleNumber'],
+                  vehicleModel: item['vehicleModel'],
+                  vehicleColor: item['vehicleColor'],
+                ),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey[200]!),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10, offset: const Offset(0, 4)),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'ID: ${item['id']}',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
                     ),
-                    child: Text(
-                      item['status'],
-                      style: TextStyle(
-                        color: item['statusColor'],
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: (item['statusColor'] as Color).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        item['status'],
+                        style: TextStyle(
+                          color: item['statusColor'],
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(item['date'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
-              const Divider(height: 24),
-              _buildLocationRow(Icons.radio_button_checked, Colors.green, item['pickup']),
-              const Padding(
-                padding: EdgeInsets.only(left: 11),
-                child: SizedBox(height: 8, child: VerticalDivider(width: 2)),
-              ),
-              _buildLocationRow(Icons.location_on, Colors.red, item['drop']),
-              const Divider(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.inventory_2_outlined, size: 16, color: Colors.grey),
-                      const SizedBox(width: 8),
-                      Text(item['item'], style: const TextStyle(fontSize: 13, color: Colors.black87)),
-                    ],
-                  ),
-                  Text(
-                    item['price'],
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(item['date'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                const Divider(height: 24),
+                _buildLocationRow(Icons.radio_button_checked, Colors.green, item['pickup']),
+                const Padding(
+                  padding: EdgeInsets.only(left: 11),
+                  child: SizedBox(height: 8, child: VerticalDivider(width: 2)),
+                ),
+                _buildLocationRow(Icons.location_on, Colors.red, item['drop']),
+                const Divider(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.inventory_2_outlined, size: 16, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Text(item['item'], style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                      ],
+                    ),
+                    Text(
+                      item['price'],
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
